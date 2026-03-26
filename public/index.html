@@ -109,7 +109,7 @@
     /* ---- Panels ---- */
     .panels {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 60px 1fr;
       min-height: calc(100vh - 56px);
     }
 
@@ -119,10 +119,134 @@
     }
     .panel-supplier {
       background: #fff;
-      border-right: 1px solid #e2e4e9;
     }
     .panel-buyer {
       background: #f5f6f8;
+    }
+
+    /* ---- Network Strip ---- */
+    .network-strip {
+      position: relative;
+      background: #f0f1f3;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .strip-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      transform: translateX(-50%);
+      background: repeating-linear-gradient(
+        to bottom,
+        #d0d2d8 0px,
+        #d0d2d8 6px,
+        transparent 6px,
+        transparent 12px
+      );
+    }
+
+    .strip-label {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      writing-mode: vertical-rl;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #b0b3be;
+      white-space: nowrap;
+    }
+
+    /* Idle pulse */
+    .idle-dot {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d0d2d8;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+    .idle-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1.5px solid #d0d2d8;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      animation: idle-pulse 3s ease-in-out infinite;
+    }
+    @keyframes idle-pulse {
+      0%, 100% { width: 8px; height: 8px; opacity: 0.8; }
+      50% { width: 28px; height: 28px; opacity: 0; }
+    }
+
+    /* Active state hides idle */
+    .network-strip.active .idle-dot,
+    .network-strip.active .idle-ring { opacity: 0; transition: opacity 0.2s; }
+
+    /* Packet dot */
+    .packet {
+      position: absolute;
+      left: 50%;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      animation: packet-travel 800ms ease-in-out forwards;
+      box-shadow: 0 0 8px currentColor;
+    }
+    .packet::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      animation: packet-glow 800ms ease-in-out forwards;
+      border: 2px solid currentColor;
+    }
+
+    @keyframes packet-travel {
+      0% { top: -10px; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: calc(100% + 10px); opacity: 0; }
+    }
+    @keyframes packet-glow {
+      0%, 100% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* Packet trail */
+    .packet-trail {
+      position: absolute;
+      left: 50%;
+      width: 2px;
+      transform: translateX(-50%);
+      z-index: 3;
+      animation: trail-travel 800ms ease-in-out forwards;
+      border-radius: 1px;
+    }
+    @keyframes trail-travel {
+      0% { top: -20px; height: 30px; opacity: 0; }
+      10% { opacity: 0.3; }
+      90% { opacity: 0.15; }
+      100% { top: calc(100% + 10px); height: 30px; opacity: 0; }
     }
 
     .panel-header {
@@ -510,7 +634,8 @@
     /* ---- Responsive ---- */
     @media (max-width: 960px) {
       .panels { grid-template-columns: 1fr; }
-      .panel-supplier { border-right: none; border-bottom: 1px solid #e2e4e9; }
+      .network-strip { display: none; }
+      .panel-supplier { border-bottom: 1px solid #e2e4e9; }
       .criteria-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
@@ -616,6 +741,14 @@
     </div>
   </div>
 
+  <!-- ======== NETWORK STRIP ======== -->
+  <div class="network-strip" id="networkStrip">
+    <div class="strip-line"></div>
+    <div class="strip-label">XMTP Network</div>
+    <div class="idle-dot"></div>
+    <div class="idle-ring"></div>
+  </div>
+
   <!-- ======== BUYER PANEL ======== -->
   <div class="panel panel-buyer">
     <div class="panel-header-row">
@@ -658,6 +791,24 @@
 <script>
   const API = window.location.origin;
   let knownOfferIds = new Set();
+
+  function sendPacket(color) {
+    const strip = document.getElementById('networkStrip');
+    const dot = document.createElement('div');
+    dot.className = 'packet';
+    dot.style.color = color;
+    dot.style.background = color;
+    const trail = document.createElement('div');
+    trail.className = 'packet-trail';
+    trail.style.background = color;
+    strip.appendChild(trail);
+    strip.appendChild(dot);
+    setTimeout(() => { dot.remove(); trail.remove(); }, 900);
+  }
+
+  function setStripActive(active) {
+    document.getElementById('networkStrip').classList.toggle('active', active);
+  }
 
   function log(msg, type = 'default') {
     const el = document.getElementById('supplierLog');
@@ -725,13 +876,17 @@
     dot.classList.add('pulsing');
     setTimeout(() => dot.classList.remove('pulsing'), 2000);
 
+    setStripActive(true);
+    sendPacket('#8b5cf6');
     log('Connecting to buyer agent via XMTP...', 'action');
 
     try {
       await delay(800);
+      sendPacket('#10b981');
       log('World ID verification \u2014 agent is human-backed', 'success');
 
       await delay(800);
+      sendPacket('#8b5cf6');
       log('Submitting offer to x402-protected endpoint...', 'action');
 
       const res = await fetch(`${API}/api/offers`, {
@@ -742,18 +897,23 @@
 
       if (res.status === 402) {
         await delay(800);
+        sendPacket('#3b82f6');
         log('Received HTTP 402 \u2014 Payment Required', 'payment');
 
         await delay(800);
+        sendPacket('#3b82f6');
         log('Signing USDC transfer \u2014 0.01 USDC on Base...', 'payment');
 
         await delay(800);
+        sendPacket('#3b82f6');
         log('Transaction submitted to network...', 'payment');
 
         await delay(800);
+        sendPacket('#10b981');
         log('Payment confirmed on-chain \u2014 access granted', 'success');
 
         await delay(800);
+        sendPacket('#8b5cf6');
         const paidRes = await fetch(`${API}/api/offers/direct`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -765,18 +925,22 @@
 
         if (result.type === 'offer_score') {
           await delay(800);
+          sendPacket('#10b981');
           log(`Score received: ${result.score}/100 \u2014 ${result.status}`, 'success');
         }
       } else {
         const result = await res.json();
         if (result.type === 'offer_score') {
           await delay(800);
+          sendPacket('#10b981');
           log(`Score received: ${result.score}/100 \u2014 ${result.status}`, 'success');
         }
       }
     } catch (e) {
       log(`Error: ${e.message}`, 'default');
     }
+
+    setStripActive(false);
 
     btn.disabled = false;
     btn.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg> Submit Offer &mdash; 0.01 USDC via x402`;

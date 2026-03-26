@@ -3,26 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sourcy — Verified Agent-to-Agent Procurement</title>
+  <title>Sourcy</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    :root {
+      --black: #000000;
+      --white: #FFFFFF;
+      --gray-50: #FAFAFA;
+      --gray-100: #F7F7F7;
+      --gray-200: #E5E5E5;
+      --gray-400: #9B9B9B;
+      --gray-600: #6B6B6B;
+      --green: #00C27A;
+      --red: #FF4444;
+      --amber: #F5A623;
+    }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f5f6f8;
-      color: #1a1a2e;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--gray-50);
+      color: var(--black);
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
 
     /* ---- Header ---- */
     header {
-      background: #fff;
-      border-bottom: 1px solid #e2e4e9;
-      padding: 0 32px;
-      height: 56px;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0 24px;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -32,106 +45,250 @@
     }
 
     .logo {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       letter-spacing: -0.5px;
-      color: #1a1a2e;
+      color: var(--black);
     }
-    .logo span { color: #6d28d9; }
 
     .badges { display: flex; gap: 6px; }
-
     .badge-wrap { position: relative; }
 
     .badge {
-      padding: 5px 14px;
-      border-radius: 20px;
+      padding: 4px 12px;
+      border-radius: 100px;
       font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
-      user-select: none;
-      border: 1px solid transparent;
+      transition: all 0.15s;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      color: var(--gray-600);
     }
-    .badge:hover { transform: translateY(-1px); }
-
-    .badge-world {
-      background: #ecfdf5;
-      color: #059669;
-      border-color: #a7f3d0;
-    }
-    .badge-x402 {
-      background: #eff6ff;
-      color: #2563eb;
-      border-color: #bfdbfe;
-    }
-    .badge-xmtp {
-      background: #f5f3ff;
-      color: #7c3aed;
-      border-color: #ddd6fe;
-    }
+    .badge:hover { border-color: var(--gray-400); }
 
     .tooltip {
       position: absolute;
       top: calc(100% + 8px);
       right: 0;
-      width: 280px;
-      background: #1a1a2e;
-      color: #e0e0e0;
+      width: 260px;
+      background: var(--black);
+      color: #ccc;
       font-size: 12px;
-      font-weight: 400;
       line-height: 1.5;
       padding: 12px 14px;
-      border-radius: 8px;
+      border-radius: 12px;
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.15s, visibility 0.15s;
       pointer-events: none;
       z-index: 200;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     }
     .tooltip::before {
       content: '';
       position: absolute;
-      top: -5px;
+      top: -4px;
       right: 16px;
-      width: 10px;
-      height: 10px;
-      background: #1a1a2e;
+      width: 8px;
+      height: 8px;
+      background: var(--black);
       transform: rotate(45deg);
     }
-    .badge-wrap:hover .tooltip {
-      opacity: 1;
-      visibility: visible;
+    .badge-wrap:hover .tooltip { opacity: 1; visibility: visible; }
+
+    /* ---- Layout ---- */
+    .layout {
+      display: flex;
+      justify-content: center;
+      min-height: calc(100vh - 52px);
     }
 
-    /* ---- Panels ---- */
     .panels {
       display: grid;
-      grid-template-columns: 1fr 60px 1fr;
-      min-height: calc(100vh - 56px);
+      grid-template-columns: 420px 48px 420px;
+      max-width: 888px;
+      width: 100%;
     }
 
     .panel {
-      padding: 28px 28px 40px;
+      padding: 24px 20px 40px;
       overflow-y: auto;
     }
-    .panel-supplier {
-      background: #fff;
-    }
-    .panel-buyer {
-      background: #f5f6f8;
-    }
+    .panel-supplier { background: var(--white); }
+    .panel-buyer { background: var(--gray-50); }
 
-    /* ---- Network Strip ---- */
-    .network-strip {
-      position: relative;
-      background: #f0f1f3;
-      overflow: hidden;
+    /* ---- Panel header ---- */
+    .panel-header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .panel-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .panel-title { font-size: 15px; font-weight: 600; }
+    .panel-subtitle { font-size: 12px; color: var(--gray-400); }
+
+    .btn-reset {
+      padding: 5px 12px;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      background: var(--white);
+      color: var(--gray-400);
+      font-size: 11px;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-reset:hover { border-color: var(--gray-400); color: var(--gray-600); }
+
+    /* ---- Cards ---- */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .panel-buyer .card { box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-400);
+      margin-bottom: 12px;
+    }
+
+    /* ---- Verification ---- */
+    .verify-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 13px;
+    }
+    .verify-row:last-child { border-bottom: none; }
+
+    .verify-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .verify-dot.green { background: var(--green); }
+    .verify-dot.dark { background: var(--black); }
+
+    @keyframes pulse-dot {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,194,122,0.4); }
+      50% { box-shadow: 0 0 0 5px rgba(0,194,122,0); }
+    }
+    .verify-dot.pulsing { animation: pulse-dot 0.8s ease 2; }
+
+    .verify-label { font-weight: 500; color: var(--black); }
+    .verify-value {
+      color: var(--gray-400);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      margin-left: auto;
+    }
+
+    /* ---- Form ---- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray-400);
+    }
+    .form-group input, .form-group textarea {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: var(--black);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.15s;
+    }
+    .form-group textarea { resize: vertical; min-height: 52px; }
+    .form-group input:focus, .form-group textarea:focus {
+      outline: none;
+      border-color: var(--black);
+    }
+
+    .btn-submit {
+      margin-top: 14px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: var(--black);
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-submit:hover { opacity: 0.85; }
+    .btn-submit:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ---- Activity Log ---- */
+    .log-box {
+      background: var(--gray-100);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .log-box::-webkit-scrollbar { width: 3px; }
+    .log-box::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 2px; }
+
+    .log-header {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-400);
+      margin-bottom: 8px;
+    }
+
+    .log-entry {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 2px 0;
+      display: flex;
+      gap: 8px;
+      line-height: 1.7;
+    }
+    .log-entry .time { color: var(--gray-400); flex-shrink: 0; }
+    .log-entry .action { color: var(--black); }
+    .log-entry .success { color: var(--green); }
+    .log-entry .payment { color: var(--gray-600); }
+    .log-entry .default { color: var(--gray-400); }
+
+    /* ---- Network Divider ---- */
+    .network-strip {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
     .strip-line {
@@ -139,503 +296,265 @@
       top: 0;
       bottom: 0;
       left: 50%;
-      width: 2px;
+      width: 1px;
+      background: var(--gray-200);
       transform: translateX(-50%);
-      background: repeating-linear-gradient(
-        to bottom,
-        #d0d2d8 0px,
-        #d0d2d8 6px,
-        transparent 6px,
-        transparent 12px
-      );
     }
 
-    .strip-label {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      writing-mode: vertical-rl;
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: #b0b3be;
-      white-space: nowrap;
+    .node {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      transition: all 0.3s;
+      flex-shrink: 0;
     }
+    .node svg {
+      width: 12px;
+      height: 12px;
+    }
+    .node-spacer { flex: 1; }
 
-    /* Idle pulse */
-    .idle-dot {
+    .node.lit-green {
+      border-color: var(--green);
+      background: #E6F9F1;
+      box-shadow: 0 0 8px rgba(0,194,122,0.3);
+    }
+    .node.lit-dark {
+      border-color: var(--black);
+      background: var(--black);
+      box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    }
+    .node.lit-dark svg { stroke: var(--white); }
+
+    /* Packets */
+    .packet {
       position: absolute;
       left: 50%;
-      top: 50%;
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #d0d2d8;
-      transform: translate(-50%, -50%);
-      z-index: 2;
+      transform: translateX(-50%);
+      z-index: 5;
+      animation: pkt-travel 800ms ease-in-out forwards;
     }
+    @keyframes pkt-travel {
+      0% { top: -8px; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { top: calc(100% + 8px); opacity: 0; }
+    }
+
+    /* Idle glow */
     .idle-ring {
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      border: 1.5px solid #d0d2d8;
+      border: 1px solid var(--gray-200);
       transform: translate(-50%, -50%);
       z-index: 1;
       animation: idle-pulse 3s ease-in-out infinite;
     }
     @keyframes idle-pulse {
-      0%, 100% { width: 8px; height: 8px; opacity: 0.8; }
-      50% { width: 28px; height: 28px; opacity: 0; }
+      0%, 100% { width: 6px; height: 6px; opacity: 0.6; }
+      50% { width: 20px; height: 20px; opacity: 0; }
     }
-
-    /* Active state hides idle */
-    .network-strip.active .idle-dot,
     .network-strip.active .idle-ring { opacity: 0; transition: opacity 0.2s; }
 
-    /* Packet dot */
-    .packet {
-      position: absolute;
-      left: 50%;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      transform: translateX(-50%);
-      z-index: 5;
-      animation: packet-travel 800ms ease-in-out forwards;
-      box-shadow: 0 0 8px currentColor;
-    }
-    .packet::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 50%;
-      animation: packet-glow 800ms ease-in-out forwards;
-      border: 2px solid currentColor;
-    }
-
-    @keyframes packet-travel {
-      0% { top: -10px; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { top: calc(100% + 10px); opacity: 0; }
-    }
-    @keyframes packet-glow {
-      0%, 100% { transform: scale(1); opacity: 0.4; }
-      50% { transform: scale(2.2); opacity: 0; }
-    }
-
-    /* Packet trail */
-    .packet-trail {
-      position: absolute;
-      left: 50%;
-      width: 2px;
-      transform: translateX(-50%);
-      z-index: 3;
-      animation: trail-travel 800ms ease-in-out forwards;
-      border-radius: 1px;
-    }
-    @keyframes trail-travel {
-      0% { top: -20px; height: 30px; opacity: 0; }
-      10% { opacity: 0.3; }
-      90% { opacity: 0.15; }
-      100% { top: calc(100% + 10px); height: 30px; opacity: 0; }
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    .panel-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
+    /* ---- Mobile horizontal connector ---- */
+    .network-strip-h {
+      display: none;
+      height: 48px;
+      background: var(--white);
+      border-top: 1px solid var(--gray-200);
+      border-bottom: 1px solid var(--gray-200);
       align-items: center;
       justify-content: center;
-      font-size: 15px;
+      gap: 0;
+      position: relative;
+      overflow: hidden;
     }
-    .panel-icon.supplier { background: #eff6ff; color: #2563eb; }
-    .panel-icon.buyer { background: #ecfdf5; color: #059669; }
-
-    .panel-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: #1a1a2e;
+    .network-strip-h .h-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: var(--gray-200);
     }
-    .panel-subtitle {
-      font-size: 12px;
-      color: #8b8fa3;
-      font-weight: 400;
+    .network-strip-h .node {
+      width: 26px;
+      height: 26px;
+      margin: 0 20px;
     }
-
-    .panel-header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-    }
-    .panel-header-row .panel-header { margin-bottom: 0; }
-
-    .btn-reset {
-      padding: 5px 12px;
-      border: 1px solid #e2e4e9;
-      border-radius: 6px;
-      background: #fff;
-      color: #8b8fa3;
-      font-size: 11px;
-      font-weight: 500;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-reset:hover { background: #f9fafb; color: #5a5a6e; border-color: #d0d2d8; }
-
-    /* ---- Verification Card ---- */
-    .card {
-      background: #fff;
-      border: 1px solid #e2e4e9;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .panel-buyer .card {
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-
-    .card-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: #8b8fa3;
-      margin-bottom: 14px;
-    }
-
-    .verify-list { display: flex; flex-direction: column; gap: 0; }
-
-    .verify-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid #f0f1f3;
-      font-size: 13px;
-      color: #3a3a4a;
-    }
-    .verify-row:last-child { border-bottom: none; }
-
-    .verify-dot {
+    .network-strip-h .h-packet {
+      position: absolute;
+      top: 50%;
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      flex-shrink: 0;
-      transition: box-shadow 0.3s;
+      transform: translateY(-50%);
+      z-index: 5;
+      animation: hpkt-travel 800ms ease-in-out forwards;
     }
-    .verify-dot.green { background: #10b981; }
-    .verify-dot.blue { background: #3b82f6; }
-    .verify-dot.purple { background: #8b5cf6; }
-
-    @keyframes pulse-dot {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
-      50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+    @keyframes hpkt-travel {
+      0% { left: -8px; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { left: calc(100% + 8px); opacity: 0; }
     }
-    .verify-dot.pulsing {
-      animation: pulse-dot 0.8s ease 2;
-    }
-
-    .verify-label { font-weight: 500; }
-    .verify-value { color: #8b8fa3; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-
-    /* ---- Form ---- */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    .form-group.full { grid-column: 1 / -1; }
-
-    .form-group label {
-      font-size: 12px;
-      font-weight: 500;
-      color: #5a5a6e;
-    }
-    .form-group input, .form-group textarea {
-      background: #f9fafb;
-      border: 1px solid #e2e4e9;
-      border-radius: 8px;
-      padding: 9px 12px;
-      color: #1a1a2e;
-      font-size: 13px;
-      font-family: 'Inter', sans-serif;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .form-group textarea {
-      resize: vertical;
-      min-height: 56px;
-    }
-    .form-group input:focus, .form-group textarea:focus {
-      outline: none;
-      border-color: #8b5cf6;
-      box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
-    }
-
-    .btn-submit {
-      margin-top: 18px;
-      width: 100%;
-      padding: 11px 20px;
-      border: none;
-      border-radius: 10px;
-      background: #6d28d9;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .btn-submit:hover { background: #5b21b6; }
-    .btn-submit:active { transform: scale(0.99); }
-    .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-
-    .btn-submit svg {
-      width: 15px;
-      height: 15px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    /* ---- Activity Log ---- */
-    .log-box {
-      background: #1a1a2e;
-      border-radius: 10px;
-      padding: 14px 16px;
-      margin-top: 16px;
-      max-height: 220px;
-      overflow-y: auto;
-    }
-    .log-box::-webkit-scrollbar { width: 4px; }
-    .log-box::-webkit-scrollbar-track { background: transparent; }
-    .log-box::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 2px; }
-
-    .log-header {
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #5a5a7a;
-      margin-bottom: 10px;
-    }
-
-    .log-entry {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11.5px;
-      padding: 3px 0;
-      display: flex;
-      gap: 8px;
-      line-height: 1.6;
-    }
-    .log-entry .time {
-      color: #4a4a6a;
-      flex-shrink: 0;
-    }
-    .log-entry .action { color: #c084fc; }
-    .log-entry .success { color: #34d399; }
-    .log-entry .payment { color: #60a5fa; }
-    .log-entry .default { color: #94a3b8; }
 
     /* ---- Criteria ---- */
     .criteria-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap: 0;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 4px 0;
     }
-    .criteria-cell {
-      padding: 12px 14px;
-      border-right: 1px solid #f0f1f3;
-    }
-    .criteria-cell:last-child { border-right: none; }
     .criteria-cell .c-label {
-      font-size: 11px;
-      color: #8b8fa3;
-      font-weight: 500;
-      margin-bottom: 4px;
+      font-size: 12px;
+      color: var(--gray-400);
+      margin-bottom: 2px;
     }
     .criteria-cell .c-value {
       font-size: 14px;
       font-weight: 600;
-      color: #1a1a2e;
+      color: var(--black);
     }
 
-    /* ---- Offers List ---- */
-    .offers-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    /* ---- Offer Cards ---- */
+    .offers-list { display: flex; flex-direction: column; gap: 10px; }
 
     @keyframes offer-in {
-      0% { opacity: 0; transform: translateY(-8px); }
-      60% { opacity: 1; transform: translateY(0); }
-      70% { box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
-      100% { box-shadow: none; }
+      0% { opacity: 0; transform: translateY(-6px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
-    .offer-card.is-new {
-      animation: offer-in 0.6s ease forwards;
-    }
+    .offer-card.is-new { animation: offer-in 0.4s ease forwards; }
 
     .offer-card {
-      background: #fff;
-      border: 1px solid #e2e4e9;
+      background: var(--white);
+      border: 1px solid var(--gray-200);
       border-radius: 12px;
-      padding: 18px 20px;
-      transition: box-shadow 0.2s;
-      position: relative;
-      overflow: hidden;
+      padding: 16px;
+      transition: box-shadow 0.15s;
     }
-    .offer-card:hover {
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .offer-card::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-    }
-    .offer-card.qualified::before { background: #10b981; }
-    .offer-card.under_review::before { background: #f59e0b; }
-    .offer-card.rejected::before { background: #ef4444; }
+    .offer-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
 
     .offer-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
-    .offer-supplier-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: #1a1a2e;
+    .offer-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .offer-meta {
-      font-size: 11px;
-      color: #8b8fa3;
-      margin-top: 2px;
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
+    .status-dot.qualified { background: var(--green); }
+    .status-dot.under_review { background: var(--amber); }
+    .status-dot.rejected { background: var(--red); }
+
+    .offer-supplier-name { font-size: 14px; font-weight: 600; }
+    .offer-meta { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
 
     .score-pill {
-      padding: 4px 14px;
-      border-radius: 20px;
+      padding: 3px 12px;
+      border-radius: 100px;
       font-size: 13px;
       font-weight: 700;
       flex-shrink: 0;
     }
-    .score-pill.qualified { background: #ecfdf5; color: #059669; }
-    .score-pill.under_review { background: #fffbeb; color: #d97706; }
-    .score-pill.rejected { background: #fef2f2; color: #dc2626; }
+    .score-pill.qualified { background: #E6F9F1; color: #00A066; }
+    .score-pill.under_review { background: #FFF5E0; color: #C4850A; }
+    .score-pill.rejected { background: #FFEEEE; color: #CC0000; }
 
     .offer-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
+      gap: 8px;
+      margin-bottom: 12px;
     }
-    .offer-stat .s-label {
-      font-size: 11px;
-      color: #8b8fa3;
-      margin-bottom: 2px;
-    }
-    .offer-stat .s-value {
-      font-size: 13px;
-      font-weight: 600;
-      color: #3a3a4a;
-    }
+    .offer-stat .s-label { font-size: 11px; color: var(--gray-400); margin-bottom: 1px; }
+    .offer-stat .s-value { font-size: 13px; font-weight: 600; }
 
-    .score-bars {
-      display: flex;
-      gap: 16px;
-    }
+    .score-bars { display: flex; gap: 12px; }
     .score-bar { flex: 1; }
     .bar-label {
       font-size: 10px;
       font-weight: 500;
-      color: #8b8fa3;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      margin-bottom: 5px;
+      color: var(--gray-400);
+      margin-bottom: 4px;
     }
     .bar-track {
-      height: 5px;
-      background: #f0f1f3;
-      border-radius: 3px;
+      height: 4px;
+      background: var(--gray-100);
+      border-radius: 2px;
       overflow: hidden;
     }
     .bar-fill {
       height: 100%;
-      border-radius: 3px;
-      transition: width 0.6s ease;
+      border-radius: 2px;
+      transition: width 0.5s ease;
     }
-    .bar-fill.high { background: #10b981; }
-    .bar-fill.mid { background: #f59e0b; }
-    .bar-fill.low { background: #ef4444; }
+    .bar-fill.high { background: var(--green); }
+    .bar-fill.mid { background: var(--amber); }
+    .bar-fill.low { background: var(--red); }
 
     .offer-feedback {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid #f0f1f3;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--gray-100);
       font-size: 12px;
-      color: #6b7280;
+      color: var(--gray-600);
       line-height: 1.5;
     }
 
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
-      color: #8b8fa3;
+      padding: 48px 20px;
+      color: var(--gray-400);
     }
     .empty-icon {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 12px;
-      background: #f0f1f3;
-      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 10px;
+      background: var(--gray-100);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 18px;
     }
-    .empty-title { font-size: 14px; font-weight: 600; color: #5a5a6e; }
-    .empty-sub { font-size: 12px; margin-top: 4px; }
+    .empty-title { font-size: 13px; font-weight: 600; color: var(--gray-600); }
+    .empty-sub { font-size: 12px; margin-top: 3px; }
 
     /* ---- Responsive ---- */
-    @media (max-width: 960px) {
-      .panels { grid-template-columns: 1fr; }
+    @media (max-width: 920px) {
+      .layout { display: block; }
+      .panels {
+        display: flex;
+        flex-direction: column;
+        max-width: 420px;
+        margin: 0 auto;
+      }
       .network-strip { display: none; }
-      .panel-supplier { border-bottom: 1px solid #e2e4e9; }
+      .network-strip-h { display: flex; }
+      .panel { width: 100%; }
       .criteria-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
@@ -643,65 +562,61 @@
 <body>
 
 <header>
-  <div class="logo">sourcy<span>.</span></div>
+  <div class="logo">sourcy</div>
   <div class="badges">
     <div class="badge-wrap">
-      <span class="badge badge-world">World ID</span>
-      <div class="tooltip">Every agent registers its wallet via World ID AgentKit, proving it represents a real verified human. The buyer server checks AgentBook on every request and rejects unverified bots.</div>
+      <span class="badge">World ID</span>
+      <div class="tooltip">Every agent proves human backing via World ID. The buyer verifies each agent through AgentBook and rejects bots automatically.</div>
     </div>
     <div class="badge-wrap">
-      <span class="badge badge-x402">x402 Payment</span>
-      <div class="tooltip">The offer endpoint is protected by HTTP 402. Supplier agents pay 0.01 USDC per submission on-chain via the x402 protocol. Per-request micropayment makes spam economically impossible.</div>
+      <span class="badge">x402</span>
+      <div class="tooltip">Offer submission costs 0.01 USDC via HTTP 402 micropayment. Per-request pricing makes spam economically impossible.</div>
     </div>
     <div class="badge-wrap">
-      <span class="badge badge-xmtp">XMTP</span>
-      <div class="tooltip">Agents communicate over XMTP, a decentralized messaging protocol. Supplier sends a structured JSON offer, buyer agent receives and scores it, and replies with the result. Real transport, not a mock.</div>
+      <span class="badge">XMTP</span>
+      <div class="tooltip">Agents communicate over XMTP, a decentralized messaging protocol. Structured offers are sent peer-to-peer with no central server.</div>
     </div>
   </div>
 </header>
 
+<div class="layout">
 <div class="panels">
 
-  <!-- ======== SUPPLIER PANEL ======== -->
+  <!-- SUPPLIER -->
   <div class="panel panel-supplier">
     <div class="panel-header">
-      <div class="panel-icon supplier">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      </div>
-      <div>
-        <div class="panel-title">Supplier Agent</div>
-        <div class="panel-subtitle">Verified sender</div>
-      </div>
-    </div>
-
-    <!-- Verification -->
-    <div class="card">
-      <div class="card-label">Agent Verification</div>
-      <div class="verify-list">
-        <div class="verify-row">
-          <div class="verify-dot green" id="dotWorld"></div>
-          <span class="verify-label">World ID</span>
-          <span class="verify-value">Human verified</span>
-        </div>
-        <div class="verify-row">
-          <div class="verify-dot blue"></div>
-          <span class="verify-label">Wallet</span>
-          <span class="verify-value" id="supplier-address">0x256c...8704</span>
-        </div>
-        <div class="verify-row">
-          <div class="verify-dot purple"></div>
-          <span class="verify-label">XMTP</span>
-          <span class="verify-value">Connected (dev)</span>
+      <div class="panel-header-left">
+        <div>
+          <div class="panel-title">Supplier Agent</div>
+          <div class="panel-subtitle">Verified sender</div>
         </div>
       </div>
     </div>
 
-    <!-- Offer Form -->
     <div class="card">
-      <div class="card-label">New Offer</div>
+      <div class="section-label">VERIFICATION</div>
+      <div class="verify-row">
+        <div class="verify-dot green" id="dotWorld"></div>
+        <span class="verify-label">World ID</span>
+        <span class="verify-value">Verified</span>
+      </div>
+      <div class="verify-row">
+        <div class="verify-dot dark"></div>
+        <span class="verify-label">Wallet</span>
+        <span class="verify-value" id="supplier-address">0x256c...8704</span>
+      </div>
+      <div class="verify-row">
+        <div class="verify-dot dark"></div>
+        <span class="verify-label">XMTP</span>
+        <span class="verify-value">Connected</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">NEW OFFER</div>
       <div class="form-grid">
         <div class="form-group">
-          <label>Supplier Name</label>
+          <label>Supplier name</label>
           <input type="text" id="supplierName" value="Acme Industrial Sensors Ltd.">
         </div>
         <div class="form-group">
@@ -713,11 +628,11 @@
           <input type="number" id="quantity" value="500">
         </div>
         <div class="form-group">
-          <label>Unit Price (USD)</label>
+          <label>Unit price (USD)</label>
           <input type="number" id="unitPrice" value="125" step="0.01">
         </div>
         <div class="form-group">
-          <label>Lead Time (days)</label>
+          <label>Lead time (days)</label>
           <input type="number" id="leadTimeDays" value="21">
         </div>
         <div class="form-group">
@@ -730,86 +645,118 @@
         </div>
       </div>
       <button class="btn-submit" id="submitBtn" onclick="submitOffer()">
-        <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
-        Submit Offer &mdash; 0.01 USDC via x402
+        Submit Offer &mdash; 0.01 USDC
       </button>
     </div>
 
-    <!-- Activity Log -->
     <div class="log-box" id="supplierLog">
-      <div class="log-header">Activity Log</div>
+      <div class="log-header">ACTIVITY LOG</div>
     </div>
   </div>
 
-  <!-- ======== NETWORK STRIP ======== -->
+  <!-- NETWORK DIVIDER (vertical, desktop) -->
   <div class="network-strip" id="networkStrip">
     <div class="strip-line"></div>
-    <div class="strip-label">XMTP Network</div>
-    <div class="idle-dot"></div>
+    <div class="node-spacer"></div>
+    <div class="node" id="nodeWorld" title="World ID">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>
+    </div>
+    <div class="node-spacer"></div>
+    <div class="node" id="nodeX402" title="x402 Payment">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    </div>
+    <div class="node-spacer"></div>
+    <div class="node" id="nodeXmtp" title="XMTP">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div class="node-spacer"></div>
     <div class="idle-ring"></div>
   </div>
 
-  <!-- ======== BUYER PANEL ======== -->
+  <!-- MOBILE HORIZONTAL CONNECTOR -->
+  <div class="network-strip-h" id="networkStripH">
+    <div class="h-line"></div>
+    <div class="node" id="nodeWorldH" title="World ID">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>
+    </div>
+    <div class="node" id="nodeX402H" title="x402">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    </div>
+    <div class="node" id="nodeXmtpH" title="XMTP">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+  </div>
+
+  <!-- BUYER -->
   <div class="panel panel-buyer">
-    <div class="panel-header-row">
-      <div class="panel-header">
-        <div class="panel-icon buyer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-        </div>
+    <div class="panel-header">
+      <div class="panel-header-left">
         <div>
-          <div class="panel-title">Buyer Agent Dashboard</div>
-          <div class="panel-subtitle">Procurement manager view</div>
+          <div class="panel-title">Buyer Dashboard</div>
+          <div class="panel-subtitle">Procurement manager</div>
         </div>
       </div>
-      <button class="btn-reset" onclick="resetDemo()">Reset Demo</button>
+      <button class="btn-reset" onclick="resetDemo()">Reset</button>
     </div>
 
-    <!-- Criteria -->
-    <div class="card" style="padding: 0; overflow: hidden;">
-      <div class="card-label" style="padding: 16px 20px 0;">Active Procurement Criteria</div>
+    <div class="card" style="padding: 16px;">
+      <div class="section-label">PROCUREMENT CRITERIA</div>
       <div class="criteria-grid" id="criteriaGrid">
         <div class="criteria-cell"><div class="c-label">Item</div><div class="c-value">&mdash;</div></div>
-        <div class="criteria-cell"><div class="c-label">Max Price</div><div class="c-value">&mdash;</div></div>
-        <div class="criteria-cell"><div class="c-label">Max Lead Time</div><div class="c-value">&mdash;</div></div>
-        <div class="criteria-cell"><div class="c-label">Required Certs</div><div class="c-value">&mdash;</div></div>
+        <div class="criteria-cell"><div class="c-label">Max price</div><div class="c-value">&mdash;</div></div>
+        <div class="criteria-cell"><div class="c-label">Max lead time</div><div class="c-value">&mdash;</div></div>
+        <div class="criteria-cell"><div class="c-label">Required certs</div><div class="c-value">&mdash;</div></div>
       </div>
     </div>
 
-    <!-- Offers -->
-    <div class="card-label" style="margin-bottom: 12px;">Received Offers</div>
+    <div class="section-label" style="margin-bottom: 10px;">RECEIVED OFFERS</div>
     <div class="offers-list" id="offersList">
       <div class="empty-state">
         <div class="empty-icon">&#x1F4E5;</div>
-        <div class="empty-title">No offers received yet</div>
+        <div class="empty-title">No offers yet</div>
         <div class="empty-sub">Submit an offer from the supplier panel</div>
       </div>
     </div>
   </div>
 
 </div>
+</div>
 
 <script>
   const API = window.location.origin;
   let knownOfferIds = new Set();
 
+  // ---- Network nodes ----
+  function lightNode(id, cls, ms = 800) {
+    const el = document.getElementById(id);
+    const elH = document.getElementById(id + 'H');
+    if (el) { el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); }
+    if (elH) { elH.classList.add(cls); setTimeout(() => elH.classList.remove(cls), ms); }
+  }
+
   function sendPacket(color) {
+    // Vertical (desktop)
     const strip = document.getElementById('networkStrip');
     const dot = document.createElement('div');
     dot.className = 'packet';
-    dot.style.color = color;
     dot.style.background = color;
-    const trail = document.createElement('div');
-    trail.className = 'packet-trail';
-    trail.style.background = color;
-    strip.appendChild(trail);
     strip.appendChild(dot);
-    setTimeout(() => { dot.remove(); trail.remove(); }, 900);
+    setTimeout(() => dot.remove(), 900);
+
+    // Horizontal (mobile)
+    const stripH = document.getElementById('networkStripH');
+    const dotH = document.createElement('div');
+    dotH.className = 'h-packet';
+    dotH.style.background = color;
+    stripH.appendChild(dotH);
+    setTimeout(() => dotH.remove(), 900);
   }
 
   function setStripActive(active) {
     document.getElementById('networkStrip').classList.toggle('active', active);
   }
 
+  // ---- Log ----
   function log(msg, type = 'default') {
     const el = document.getElementById('supplierLog');
     const time = new Date().toLocaleTimeString();
@@ -820,6 +767,7 @@
     el.scrollTop = el.scrollHeight;
   }
 
+  // ---- Data ----
   async function loadCriteria() {
     try {
       const res = await fetch(`${API}/api/health`);
@@ -827,17 +775,15 @@
       const c = data.criteria;
       document.getElementById('criteriaGrid').innerHTML = `
         <div class="criteria-cell"><div class="c-label">Item</div><div class="c-value">${c.item}</div></div>
-        <div class="criteria-cell"><div class="c-label">Max Price</div><div class="c-value">$${c.maxUnitPrice}</div></div>
-        <div class="criteria-cell"><div class="c-label">Max Lead Time</div><div class="c-value">${c.maxLeadTimeDays} days</div></div>
-        <div class="criteria-cell"><div class="c-label">Required Certs</div><div class="c-value">${c.requiredCertifications.join(', ')}</div></div>
+        <div class="criteria-cell"><div class="c-label">Max price</div><div class="c-value">$${c.maxUnitPrice}</div></div>
+        <div class="criteria-cell"><div class="c-label">Max lead time</div><div class="c-value">${c.maxLeadTimeDays} days</div></div>
+        <div class="criteria-cell"><div class="c-label">Required certs</div><div class="c-value">${c.requiredCertifications.join(', ')}</div></div>
       `;
       if (data.xmtpAddress) {
         const a = data.xmtpAddress;
         document.getElementById('supplier-address').textContent = a.slice(0, 6) + '...' + a.slice(-4);
       }
-    } catch (e) {
-      console.error('Failed to load criteria:', e);
-    }
+    } catch (e) {}
   }
 
   async function resetDemo() {
@@ -846,15 +792,16 @@
     document.getElementById('offersList').innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">&#x1F4E5;</div>
-        <div class="empty-title">No offers received yet</div>
+        <div class="empty-title">No offers yet</div>
         <div class="empty-sub">Submit an offer from the supplier panel</div>
       </div>`;
   }
 
+  // ---- Submit ----
   async function submitOffer() {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span>Submitting...</span>';
+    btn.textContent = 'Submitting...';
 
     const offer = {
       type: 'procurement_offer',
@@ -871,22 +818,23 @@
 
     const delay = ms => new Promise(r => setTimeout(r, ms));
 
-    // Pulse the World ID dot
     const dot = document.getElementById('dotWorld');
     dot.classList.add('pulsing');
     setTimeout(() => dot.classList.remove('pulsing'), 2000);
 
     setStripActive(true);
-    sendPacket('#8b5cf6');
+    lightNode('nodeXmtp', 'lit-dark');
+    sendPacket('#000');
     log('Connecting to buyer agent via XMTP...', 'action');
 
     try {
       await delay(800);
-      sendPacket('#10b981');
+      lightNode('nodeWorld', 'lit-green');
+      sendPacket('#00C27A');
       log('World ID verification \u2014 agent is human-backed', 'success');
 
       await delay(800);
-      sendPacket('#8b5cf6');
+      sendPacket('#000');
       log('Submitting offer to x402-protected endpoint...', 'action');
 
       const res = await fetch(`${API}/api/offers`, {
@@ -897,42 +845,44 @@
 
       if (res.status === 402) {
         await delay(800);
-        sendPacket('#3b82f6');
+        lightNode('nodeX402', 'lit-dark');
+        sendPacket('#6B6B6B');
         log('Received HTTP 402 \u2014 Payment Required', 'payment');
 
         await delay(800);
-        sendPacket('#3b82f6');
+        lightNode('nodeX402', 'lit-dark');
+        sendPacket('#6B6B6B');
         log('Signing USDC transfer \u2014 0.01 USDC on Base...', 'payment');
 
         await delay(800);
-        sendPacket('#3b82f6');
+        sendPacket('#6B6B6B');
         log('Transaction submitted to network...', 'payment');
 
         await delay(800);
-        sendPacket('#10b981');
+        sendPacket('#00C27A');
         log('Payment confirmed on-chain \u2014 access granted', 'success');
 
         await delay(800);
-        sendPacket('#8b5cf6');
+        lightNode('nodeXmtp', 'lit-dark');
+        sendPacket('#000');
         const paidRes = await fetch(`${API}/api/offers/direct`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(offer),
         });
         const result = await paidRes.json();
-
         log('Offer delivered to buyer agent', 'action');
 
         if (result.type === 'offer_score') {
           await delay(800);
-          sendPacket('#10b981');
+          sendPacket('#00C27A');
           log(`Score received: ${result.score}/100 \u2014 ${result.status}`, 'success');
         }
       } else {
         const result = await res.json();
         if (result.type === 'offer_score') {
           await delay(800);
-          sendPacket('#10b981');
+          sendPacket('#00C27A');
           log(`Score received: ${result.score}/100 \u2014 ${result.status}`, 'success');
         }
       }
@@ -941,12 +891,12 @@
     }
 
     setStripActive(false);
-
     btn.disabled = false;
-    btn.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg> Submit Offer &mdash; 0.01 USDC via x402`;
+    btn.textContent = 'Submit Offer \u2014 0.01 USDC';
     loadOffers();
   }
 
+  // ---- Render ----
   function barClass(score) {
     if (score >= 70) return 'high';
     if (score >= 40) return 'mid';
@@ -961,17 +911,20 @@
 
   function renderOffer(o, isNew) {
     return `
-      <div class="offer-card ${o.status}${isNew ? ' is-new' : ''}">
+      <div class="offer-card${isNew ? ' is-new' : ''}">
         <div class="offer-top">
           <div>
-            <div class="offer-supplier-name">${o.supplierName}</div>
+            <div class="offer-name-row">
+              <div class="status-dot ${o.status}"></div>
+              <div class="offer-supplier-name">${o.supplierName}</div>
+            </div>
             <div class="offer-meta">${o.offerId} &middot; ${new Date(o.receivedAt).toLocaleTimeString()}</div>
           </div>
           <div class="score-pill ${o.status}">${o.score}/100</div>
         </div>
         <div class="offer-grid">
           <div class="offer-stat"><div class="s-label">Status</div><div class="s-value">${statusLabel(o.status)}</div></div>
-          <div class="offer-stat"><div class="s-label">Price Score</div><div class="s-value">${o.breakdown.priceScore}%</div></div>
+          <div class="offer-stat"><div class="s-label">Price score</div><div class="s-value">${o.breakdown.priceScore}%</div></div>
           <div class="offer-stat"><div class="s-label">Certifications</div><div class="s-value">${o.breakdown.certificationScore}%</div></div>
         </div>
         <div class="score-bars">
@@ -980,7 +933,7 @@
             <div class="bar-track"><div class="bar-fill ${barClass(o.breakdown.priceScore)}" style="width:${o.breakdown.priceScore}%"></div></div>
           </div>
           <div class="score-bar">
-            <div class="bar-label">Lead Time ${o.breakdown.leadTimeScore}%</div>
+            <div class="bar-label">Lead time ${o.breakdown.leadTimeScore}%</div>
             <div class="bar-track"><div class="bar-fill ${barClass(o.breakdown.leadTimeScore)}" style="width:${o.breakdown.leadTimeScore}%"></div></div>
           </div>
           <div class="score-bar">
@@ -1008,18 +961,11 @@
       });
 
       const newIds = new Set(sorted.map(o => o.offerId));
-      list.innerHTML = sorted.map(o => {
-        const isNew = !knownOfferIds.has(o.offerId);
-        return renderOffer(o, isNew);
-      }).join('');
-
+      list.innerHTML = sorted.map(o => renderOffer(o, !knownOfferIds.has(o.offerId))).join('');
       knownOfferIds = newIds;
-    } catch (e) {
-      console.error('Failed to load offers:', e);
-    }
+    } catch (e) {}
   }
 
-  // Init
   loadCriteria();
   loadOffers();
   setInterval(loadOffers, 3000);

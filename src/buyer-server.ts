@@ -106,6 +106,7 @@ app.get("/api/health", (c) => {
   return c.json({
     status: "ok",
     agent: "sourcy-buyer",
+    xmtpAddress: agent.address,
     criteria,
     offersReceived: scoredOffers.length,
   });
@@ -158,6 +159,13 @@ app.post("/api/offers/direct", async (c) => {
   );
 
   return c.json(result);
+});
+
+// --- Reset endpoint (demo only) ---
+app.delete("/api/offers/reset", (c) => {
+  scoredOffers.length = 0;
+  console.log("[HTTP] Dashboard reset — all offers cleared");
+  return c.json({ status: "ok", cleared: true });
 });
 
 // --- Dashboard data endpoint ---

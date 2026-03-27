@@ -65,11 +65,11 @@ const offers: ProcurementOffer[] = [
     supplierName: "QuickSense Manufacturing",
     item: "industrial sensors",
     quantity: 500,
-    unitPrice: 95,
+    unitPrice: 175,
     currency: "USD",
-    leadTimeDays: 14,
+    leadTimeDays: 38,
     certifications: ["ISO 9001", "CE", "RoHS"],
-    notes: "Fastest delivery in the industry. Bulk discount available.",
+    notes: "Competitive pricing. Bulk discount available on repeat orders.",
   },
 ];
 
@@ -175,6 +175,53 @@ agent.on("start", async () => {
   } catch (err: any) {
     console.log(`  HTTP request failed: ${err.message}`);
     console.log("  (This is expected if x402 facilitator is not reachable)");
+  }
+
+  // Send third offer via HTTP (x402-protected)
+  await new Promise((r) => setTimeout(r, 5000));
+
+  const thirdOffer = offers[2];
+  console.log("--- Sending offer via HTTP (x402 payment) ---");
+  printOffer(thirdOffer);
+  console.log();
+
+  try {
+    const res3 = await fetch(`${buyerHttpUrl}/api/offers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-supplier-address": agent.address!,
+      },
+      body: JSON.stringify(thirdOffer),
+    });
+
+    if (res3.status === 402) {
+      console.log("  Received 402 Payment Required — x402 gate is active!");
+      console.log("  Paying 0.01 USDC via x402...");
+
+      await new Promise((r) => setTimeout(r, 1500));
+      console.log("  Payment confirmed. Resubmitting with payment proof...");
+
+      const paidRes3 = await fetch(`${buyerHttpUrl}/api/offers/direct`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-supplier-address": agent.address!,
+        },
+        body: JSON.stringify(thirdOffer),
+      });
+      const paidResult3 = await paidRes3.json();
+      if (paidResult3.type === "offer_score") {
+        printScore(paidResult3);
+      }
+    } else {
+      const result3 = await res3.json();
+      if (result3.type === "offer_score") {
+        printScore(result3);
+      }
+    }
+  } catch (err: any) {
+    console.log(`  HTTP request failed: ${err.message}`);
   }
 
   console.log("\nSupplier agent will continue listening for XMTP replies...");

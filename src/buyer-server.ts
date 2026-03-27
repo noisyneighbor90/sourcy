@@ -126,6 +126,7 @@ app.post("/api/offers", async (c) => {
     ...result,
     supplierName: body.supplierName,
     supplierAddress: c.req.header("x-supplier-address") || "unknown",
+    channel: "http" as const,
     receivedAt: new Date().toISOString(),
   };
   scoredOffers.push(entry);
@@ -151,6 +152,7 @@ app.post("/api/offers/direct", async (c) => {
     ...result,
     supplierName: body.supplierName,
     supplierAddress: c.req.header("x-supplier-address") || "demo-ui",
+    channel: "http" as const,
     receivedAt: new Date().toISOString(),
   });
 
@@ -233,6 +235,7 @@ agent.on("text", async (ctx) => {
     ...result,
     supplierName: offer.supplierName,
     supplierAddress: senderAddress,
+    channel: "xmtp" as const,
     receivedAt: new Date().toISOString(),
   });
 

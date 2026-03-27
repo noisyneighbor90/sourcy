@@ -105,8 +105,8 @@
 
     .panels {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      max-width: 888px;
+      grid-template-columns: 1fr 60px 1fr;
+      max-width: 920px;
       width: 100%;
     }
 
@@ -281,40 +281,50 @@
     .log-entry .payment { color: var(--gray-600); }
     .log-entry .default { color: var(--gray-400); }
 
-    /* ---- Network Bar ---- */
+    /* ---- Network Strip (vertical center column) ---- */
     .network-bar {
-      grid-column: 1 / -1;
-      background: var(--white);
-      border-top: 1px solid var(--gray-200);
-      border-bottom: 1px solid var(--gray-200);
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px 40px 10px;
-      position: relative;
       overflow: hidden;
+      background: var(--gray-50);
     }
 
     .net-vis {
       position: relative;
       width: 100%;
-      max-width: 500px;
-      height: 44px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Vertical connection line */
+    .net-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 1px;
+      background: var(--gray-200);
+      transform: translateX(-50%);
+      z-index: 1;
     }
 
     /* Nodes */
     .net-node {
       position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
       z-index: 3;
     }
-    .net-node.left { left: 0; }
-    .net-node.right { right: 0; }
+    .net-node.top { top: 24px; }
+    .net-node.bottom { bottom: 24px; }
 
     .net-ring {
       width: 32px;
@@ -327,13 +337,10 @@
       justify-content: center;
       transition: all 0.3s;
     }
-    .net-node.left .net-ring { border-color: #3b82f6; }
-    .net-node.right .net-ring { border-color: var(--green); }
+    .net-node.top .net-ring { border-color: #3b82f6; }
+    .net-node.bottom .net-ring { border-color: var(--green); }
 
-    .net-ring svg {
-      width: 14px;
-      height: 14px;
-    }
+    .net-ring svg { width: 14px; height: 14px; }
 
     @keyframes node-pulse-blue {
       0%, 100% { box-shadow: none; }
@@ -343,46 +350,38 @@
       0%, 100% { box-shadow: none; }
       50% { box-shadow: 0 0 0 6px rgba(0,194,122,0.15); }
     }
-    .net-node.left.pulse .net-ring { animation: node-pulse-blue 0.6s ease; }
-    .net-node.right.pulse .net-ring { animation: node-pulse-green 0.6s ease; }
+    .net-node.top.pulse .net-ring { animation: node-pulse-blue 0.6s ease; }
+    .net-node.bottom.pulse .net-ring { animation: node-pulse-green 0.6s ease; }
 
     .net-label {
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 600;
       color: var(--gray-400);
       margin-top: 3px;
       letter-spacing: 0.3px;
     }
 
-    /* Connection line */
-    .net-line {
+    .net-line-label {
       position: absolute;
       top: 50%;
-      left: 36px;
-      right: 36px;
-      height: 1px;
-      background: var(--gray-200);
-      transform: translateY(-50%);
-      z-index: 1;
-    }
-
-    .net-line-label {
-      font-size: 9px;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-90deg);
+      font-size: 8px;
       color: var(--gray-400);
-      letter-spacing: 0.5px;
-      margin-top: 2px;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+      z-index: 2;
     }
 
-    /* Packets */
+    /* Packets — travel top to bottom */
     .net-packet {
       position: absolute;
-      top: 50%;
+      left: 50%;
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      transform: translateY(-50%);
+      transform: translateX(-50%);
       z-index: 5;
-      left: 36px;
       animation: net-pkt 800ms ease-in-out forwards;
     }
     .net-packet::after {
@@ -393,31 +392,30 @@
       border: 1px solid currentColor;
       opacity: 0.3;
     }
-
     @keyframes net-pkt {
-      0% { left: 32px; opacity: 0; }
+      0% { top: 20px; opacity: 0; }
       8% { opacity: 1; }
       92% { opacity: 1; }
-      100% { left: calc(100% - 40px); opacity: 0; }
+      100% { top: calc(100% - 28px); opacity: 0; }
     }
 
-    /* Idle pulse — slow dot traveling right to left */
+    /* Idle — slow dot traveling bottom to top */
     .net-idle {
       position: absolute;
-      top: 50%;
+      left: 50%;
       width: 4px;
       height: 4px;
       border-radius: 50%;
       background: var(--gray-200);
-      transform: translateY(-50%);
+      transform: translateX(-50%);
       z-index: 2;
       animation: net-idle-travel 4s ease-in-out infinite;
     }
     @keyframes net-idle-travel {
-      0% { left: calc(100% - 40px); opacity: 0; }
+      0% { top: calc(100% - 30px); opacity: 0; }
       10% { opacity: 0.5; }
       90% { opacity: 0.5; }
-      100% { left: 36px; opacity: 0; }
+      100% { top: 26px; opacity: 0; }
     }
     .network-bar.active .net-idle { opacity: 0 !important; animation: none; }
 
@@ -572,7 +570,22 @@
         margin: 0 auto;
       }
       .panel { width: 100%; }
-      .network-bar { padding: 14px 20px 8px; }
+      .network-bar {
+        flex-direction: row;
+        height: 48px;
+        border-top: 1px solid var(--gray-200);
+        border-bottom: 1px solid var(--gray-200);
+      }
+      .network-bar .net-vis { flex-direction: row; height: 48px; }
+      .network-bar .net-line {
+        top: 50%; bottom: auto; left: 0; right: 0;
+        width: 100%; height: 1px;
+        transform: translateY(-50%);
+      }
+      .network-bar .net-node { transform: translateY(-50%); top: 50%; left: auto; bottom: auto; }
+      .network-bar .net-node.top { left: 12px; transform: translateY(-50%); top: 50%; }
+      .network-bar .net-node.bottom { right: 12px; left: auto; transform: translateY(-50%); top: 50%; }
+      .network-bar .net-line-label { transform: none; position: static; }
       .criteria-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
@@ -672,25 +685,25 @@
     </div>
   </div>
 
-  <!-- NETWORK BAR -->
+  <!-- NETWORK STRIP -->
   <div class="network-bar" id="networkBar">
     <div class="net-vis" id="netVis">
-      <div class="net-node left" id="nodeSupplier">
+      <div class="net-line"></div>
+      <div class="net-node top" id="nodeSupplier">
         <div class="net-ring">
           <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div class="net-label">Supplier</div>
       </div>
-      <div class="net-line"></div>
-      <div class="net-idle"></div>
-      <div class="net-node right" id="nodeBuyer">
+      <div class="net-line-label">XMTP</div>
+      <div class="net-node bottom" id="nodeBuyer">
         <div class="net-ring">
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
         </div>
         <div class="net-label">Buyer</div>
       </div>
+      <div class="net-idle"></div>
     </div>
-    <div class="net-line-label">XMTP Network</div>
   </div>
 
   <!-- BUYER -->
@@ -734,7 +747,7 @@
 
   // ---- Network bar ----
   function pulseNode(side) {
-    const el = document.getElementById(side === 'left' ? 'nodeSupplier' : 'nodeBuyer');
+    const el = document.getElementById(side === 'supplier' ? 'nodeSupplier' : 'nodeBuyer');
     el.classList.remove('pulse');
     void el.offsetWidth;
     el.classList.add('pulse');
@@ -748,7 +761,7 @@
     dot.style.background = color;
     dot.style.color = color;
     vis.appendChild(dot);
-    pulseNode('right');
+    pulseNode('buyer');
     setTimeout(() => dot.remove(), 900);
   }
 
@@ -823,7 +836,7 @@
     setTimeout(() => dot.classList.remove('pulsing'), 2000);
 
     setStripActive(true);
-    pulseNode('left');
+    pulseNode('supplier');
     sendPacket('#000');
     log('Connecting to buyer agent via XMTP...', 'action');
 
@@ -860,7 +873,7 @@
         log('Payment confirmed on-chain \u2014 access granted', 'success');
 
         await delay(800);
-        lightNode('nodeXmtp', 'lit-dark');
+        pulseNode('left');
         sendPacket('#000');
         const paidRes = await fetch(`${API}/api/offers/direct`, {
           method: 'POST',

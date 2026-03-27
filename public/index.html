@@ -105,7 +105,7 @@
 
     .panels {
       display: grid;
-      grid-template-columns: 420px 48px 420px;
+      grid-template-columns: 1fr 1fr;
       max-width: 888px;
       width: 100%;
     }
@@ -281,121 +281,100 @@
     .log-entry .payment { color: var(--gray-600); }
     .log-entry .default { color: var(--gray-400); }
 
-    /* ---- Network Divider ---- */
-    .network-strip {
-      position: relative;
+    /* ---- Network Bar ---- */
+    .network-bar {
+      grid-column: 1 / -1;
+      background: var(--white);
+      border-top: 1px solid var(--gray-200);
+      border-bottom: 1px solid var(--gray-200);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
-    }
-
-    .strip-line {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      width: 1px;
-      background: var(--gray-200);
-      transform: translateX(-50%);
-    }
-
-    .node {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--white);
-      border: 1px solid var(--gray-200);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2;
-      transition: all 0.3s;
-      flex-shrink: 0;
-    }
-    .node svg {
-      width: 12px;
-      height: 12px;
-    }
-    .node-spacer { flex: 1; }
-
-    .node.lit-green {
-      border-color: var(--green);
-      background: #E6F9F1;
-      box-shadow: 0 0 8px rgba(0,194,122,0.3);
-    }
-    .node.lit-dark {
-      border-color: var(--black);
-      background: var(--black);
-      box-shadow: 0 0 8px rgba(0,0,0,0.2);
-    }
-    .node.lit-dark svg { stroke: var(--white); }
-
-    /* Packets */
-    .packet {
-      position: absolute;
-      left: 50%;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      transform: translateX(-50%);
-      z-index: 5;
-      animation: pkt-travel 800ms ease-in-out forwards;
-    }
-    @keyframes pkt-travel {
-      0% { top: -8px; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { top: calc(100% + 8px); opacity: 0; }
-    }
-
-    /* Idle glow */
-    .idle-ring {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      border: 1px solid var(--gray-200);
-      transform: translate(-50%, -50%);
-      z-index: 1;
-      animation: idle-pulse 3s ease-in-out infinite;
-    }
-    @keyframes idle-pulse {
-      0%, 100% { width: 6px; height: 6px; opacity: 0.6; }
-      50% { width: 20px; height: 20px; opacity: 0; }
-    }
-    .network-strip.active .idle-ring { opacity: 0; transition: opacity 0.2s; }
-
-    /* ---- Mobile horizontal connector ---- */
-    .network-strip-h {
-      display: none;
-      height: 48px;
-      background: var(--white);
-      border-top: 1px solid var(--gray-200);
-      border-bottom: 1px solid var(--gray-200);
-      align-items: center;
-      justify-content: center;
-      gap: 0;
+      padding: 16px 40px 10px;
       position: relative;
       overflow: hidden;
     }
-    .network-strip-h .h-line {
+
+    .net-vis {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      height: 44px;
+    }
+
+    /* Nodes */
+    .net-node {
       position: absolute;
-      left: 0;
-      right: 0;
       top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 3;
+    }
+    .net-node.left { left: 0; }
+    .net-node.right { right: 0; }
+
+    .net-ring {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-200);
+      background: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    .net-node.left .net-ring { border-color: #3b82f6; }
+    .net-node.right .net-ring { border-color: var(--green); }
+
+    .net-ring svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    @keyframes node-pulse-blue {
+      0%, 100% { box-shadow: none; }
+      50% { box-shadow: 0 0 0 6px rgba(59,130,246,0.15); }
+    }
+    @keyframes node-pulse-green {
+      0%, 100% { box-shadow: none; }
+      50% { box-shadow: 0 0 0 6px rgba(0,194,122,0.15); }
+    }
+    .net-node.left.pulse .net-ring { animation: node-pulse-blue 0.6s ease; }
+    .net-node.right.pulse .net-ring { animation: node-pulse-green 0.6s ease; }
+
+    .net-label {
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--gray-400);
+      margin-top: 3px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Connection line */
+    .net-line {
+      position: absolute;
+      top: 50%;
+      left: 36px;
+      right: 36px;
       height: 1px;
       background: var(--gray-200);
+      transform: translateY(-50%);
+      z-index: 1;
     }
-    .network-strip-h .node {
-      width: 26px;
-      height: 26px;
-      margin: 0 20px;
+
+    .net-line-label {
+      font-size: 9px;
+      color: var(--gray-400);
+      letter-spacing: 0.5px;
+      margin-top: 2px;
     }
-    .network-strip-h .h-packet {
+
+    /* Packets */
+    .net-packet {
       position: absolute;
       top: 50%;
       width: 8px;
@@ -403,14 +382,44 @@
       border-radius: 50%;
       transform: translateY(-50%);
       z-index: 5;
-      animation: hpkt-travel 800ms ease-in-out forwards;
+      left: 36px;
+      animation: net-pkt 800ms ease-in-out forwards;
     }
-    @keyframes hpkt-travel {
-      0% { left: -8px; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { left: calc(100% + 8px); opacity: 0; }
+    .net-packet::after {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      opacity: 0.3;
     }
+
+    @keyframes net-pkt {
+      0% { left: 32px; opacity: 0; }
+      8% { opacity: 1; }
+      92% { opacity: 1; }
+      100% { left: calc(100% - 40px); opacity: 0; }
+    }
+
+    /* Idle pulse — slow dot traveling right to left */
+    .net-idle {
+      position: absolute;
+      top: 50%;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--gray-200);
+      transform: translateY(-50%);
+      z-index: 2;
+      animation: net-idle-travel 4s ease-in-out infinite;
+    }
+    @keyframes net-idle-travel {
+      0% { left: calc(100% - 40px); opacity: 0; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% { left: 36px; opacity: 0; }
+    }
+    .network-bar.active .net-idle { opacity: 0 !important; animation: none; }
 
     /* ---- Criteria ---- */
     .criteria-grid {
@@ -562,9 +571,8 @@
         max-width: 420px;
         margin: 0 auto;
       }
-      .network-strip { display: none; }
-      .network-strip-h { display: flex; }
       .panel { width: 100%; }
+      .network-bar { padding: 14px 20px 8px; }
       .criteria-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
@@ -664,37 +672,25 @@
     </div>
   </div>
 
-  <!-- NETWORK DIVIDER (vertical, desktop) -->
-  <div class="network-strip" id="networkStrip">
-    <div class="strip-line"></div>
-    <div class="node-spacer"></div>
-    <div class="node" id="nodeWorld" title="World ID">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>
+  <!-- NETWORK BAR -->
+  <div class="network-bar" id="networkBar">
+    <div class="net-vis" id="netVis">
+      <div class="net-node left" id="nodeSupplier">
+        <div class="net-ring">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="net-label">Supplier</div>
+      </div>
+      <div class="net-line"></div>
+      <div class="net-idle"></div>
+      <div class="net-node right" id="nodeBuyer">
+        <div class="net-ring">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <div class="net-label">Buyer</div>
+      </div>
     </div>
-    <div class="node-spacer"></div>
-    <div class="node" id="nodeX402" title="x402 Payment">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-    </div>
-    <div class="node-spacer"></div>
-    <div class="node" id="nodeXmtp" title="XMTP">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    </div>
-    <div class="node-spacer"></div>
-    <div class="idle-ring"></div>
-  </div>
-
-  <!-- MOBILE HORIZONTAL CONNECTOR -->
-  <div class="network-strip-h" id="networkStripH">
-    <div class="h-line"></div>
-    <div class="node" id="nodeWorldH" title="World ID">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>
-    </div>
-    <div class="node" id="nodeX402H" title="x402">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-    </div>
-    <div class="node" id="nodeXmtpH" title="XMTP">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gray-400)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    </div>
+    <div class="net-line-label">XMTP Network</div>
   </div>
 
   <!-- BUYER -->
@@ -736,34 +732,28 @@
   const API = window.location.origin;
   let knownOfferIds = new Set();
 
-  // ---- Network nodes ----
-  function lightNode(id, cls, ms = 800) {
-    const el = document.getElementById(id);
-    const elH = document.getElementById(id + 'H');
-    if (el) { el.classList.add(cls); setTimeout(() => el.classList.remove(cls), ms); }
-    if (elH) { elH.classList.add(cls); setTimeout(() => elH.classList.remove(cls), ms); }
+  // ---- Network bar ----
+  function pulseNode(side) {
+    const el = document.getElementById(side === 'left' ? 'nodeSupplier' : 'nodeBuyer');
+    el.classList.remove('pulse');
+    void el.offsetWidth;
+    el.classList.add('pulse');
+    setTimeout(() => el.classList.remove('pulse'), 700);
   }
 
   function sendPacket(color) {
-    // Vertical (desktop)
-    const strip = document.getElementById('networkStrip');
+    const vis = document.getElementById('netVis');
     const dot = document.createElement('div');
-    dot.className = 'packet';
+    dot.className = 'net-packet';
     dot.style.background = color;
-    strip.appendChild(dot);
+    dot.style.color = color;
+    vis.appendChild(dot);
+    pulseNode('right');
     setTimeout(() => dot.remove(), 900);
-
-    // Horizontal (mobile)
-    const stripH = document.getElementById('networkStripH');
-    const dotH = document.createElement('div');
-    dotH.className = 'h-packet';
-    dotH.style.background = color;
-    stripH.appendChild(dotH);
-    setTimeout(() => dotH.remove(), 900);
   }
 
   function setStripActive(active) {
-    document.getElementById('networkStrip').classList.toggle('active', active);
+    document.getElementById('networkBar').classList.toggle('active', active);
   }
 
   // ---- Log ----
@@ -833,13 +823,12 @@
     setTimeout(() => dot.classList.remove('pulsing'), 2000);
 
     setStripActive(true);
-    lightNode('nodeXmtp', 'lit-dark');
+    pulseNode('left');
     sendPacket('#000');
     log('Connecting to buyer agent via XMTP...', 'action');
 
     try {
       await delay(800);
-      lightNode('nodeWorld', 'lit-green');
       sendPacket('#00C27A');
       log('World ID verification \u2014 agent is human-backed', 'success');
 
@@ -855,12 +844,10 @@
 
       if (res.status === 402) {
         await delay(800);
-        lightNode('nodeX402', 'lit-dark');
         sendPacket('#6B6B6B');
         log('Received HTTP 402 \u2014 Payment Required', 'payment');
 
         await delay(800);
-        lightNode('nodeX402', 'lit-dark');
         sendPacket('#6B6B6B');
         log('Signing USDC transfer \u2014 0.01 USDC on Base...', 'payment');
 

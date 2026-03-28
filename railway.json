@@ -1,0 +1,9 @@
+{
+  "build": {
+    "builder": "DOCKERFILE"
+  },
+  "deploy": {
+    "startCommand": "npx tsx src/buyer-server.ts",
+    "healthcheckPath": "/api/health"
+  }
+}

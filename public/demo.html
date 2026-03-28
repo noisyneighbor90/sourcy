@@ -419,6 +419,26 @@
     }
     .network-bar.active .net-idle { opacity: 0 !important; animation: none; }
 
+    /* ---- Approve button ---- */
+    .btn-approve {
+      margin-top: 12px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      background: var(--black);
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn-approve:hover { opacity: 0.85; }
+    .btn-approve.approved {
+      background: var(--green);
+      cursor: default;
+    }
+
     /* ---- Stats Row ---- */
     .stats-row {
       display: grid;
@@ -887,6 +907,13 @@
     loadOffers();
   }
 
+  function approveOffer(btn, name) {
+    btn.textContent = 'Approved';
+    btn.classList.add('approved');
+    btn.disabled = true;
+    log(`Approved ${name} \u2014 supplier notified via XMTP`, 'success');
+  }
+
   async function loadDemoData() {
     await fetch(`${API}/api/offers/demo`, { method: 'POST' });
     knownOfferIds = new Set();
@@ -1035,6 +1062,7 @@
           </div>
         </div>
         <div class="offer-feedback">${o.feedback}</div>
+        ${o.status === 'qualified' ? `<button class="btn-approve" onclick="approveOffer(this, '${o.supplierName}')">Approve Supplier</button>` : ''}
       </div>
     `;
   }

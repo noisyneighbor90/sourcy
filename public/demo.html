@@ -419,6 +419,30 @@
     }
     .network-bar.active .net-idle { opacity: 0 !important; animation: none; }
 
+    /* ---- Stats Row ---- */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .stat-box {
+      text-align: center;
+      padding: 12px 8px;
+    }
+    .stat-num {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .stat-green { color: var(--green); }
+    .stat-red { color: var(--red); }
+    .stat-label {
+      font-size: 11px;
+      color: var(--gray-400);
+      margin-top: 4px;
+    }
+
     /* ---- Criteria ---- */
     .criteria-grid {
       display: grid;
@@ -732,6 +756,12 @@
       </div>
     </div>
 
+    <div class="stats-row" id="statsRow">
+      <div class="stat-box"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total received</div></div>
+      <div class="stat-box"><div class="stat-num stat-green" id="statQualified">0</div><div class="stat-label">Qualified</div></div>
+      <div class="stat-box"><div class="stat-num stat-red" id="statRejected">0</div><div class="stat-label">Rejected</div></div>
+    </div>
+
     <div class="card" style="padding: 16px;">
       <div class="section-label">PROCUREMENT CRITERIA</div>
       <div class="criteria-grid" id="criteriaGrid">
@@ -1005,6 +1035,11 @@
     try {
       const res = await fetch(`${API}/api/offers`);
       const data = await res.json();
+
+      document.getElementById('statTotal').textContent = data.total;
+      document.getElementById('statQualified').textContent = data.qualified;
+      document.getElementById('statRejected').textContent = data.rejected;
+
       const list = document.getElementById('offersList');
       if (data.offers.length === 0) return;
 

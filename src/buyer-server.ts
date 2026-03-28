@@ -225,6 +225,9 @@ app.get("/api/offers", (c) => {
     criteria,
     offers: scoredOffers,
     total: scoredOffers.length,
+    qualified: scoredOffers.filter((o) => o.status === "qualified").length,
+    rejected: scoredOffers.filter((o) => o.status === "rejected").length,
+    under_review: scoredOffers.filter((o) => o.status === "under_review").length,
   });
 });
 

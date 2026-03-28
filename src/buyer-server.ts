@@ -219,6 +219,52 @@ app.delete("/api/offers/reset", (c) => {
   return c.json({ status: "ok", cleared: true });
 });
 
+// --- Load demo data ---
+app.post("/api/offers/demo", (c) => {
+  scoredOffers.length = 0;
+  const now = Date.now();
+  scoredOffers.push(
+    {
+      type: "offer_score",
+      offerId: "d7a1e3",
+      score: 96,
+      status: "qualified",
+      breakdown: { priceScore: 90, leadTimeScore: 100, certificationScore: 100 },
+      feedback: "Offer meets procurement criteria. Score: 96/100.",
+      supplierName: "TLT Electronics UAB",
+      supplierAddress: "0x256c736a07ca76e079e372b24b802a07ddec8704",
+      channel: "xmtp",
+      receivedAt: new Date(now - 45000).toISOString(),
+    },
+    {
+      type: "offer_score",
+      offerId: "b4f829",
+      score: 74,
+      status: "under_review",
+      breakdown: { priceScore: 77, leadTimeScore: 93, certificationScore: 50 },
+      feedback: "Offer is borderline. Score: 74/100. Areas to improve: certifications.",
+      supplierName: "PCBuild Poland",
+      supplierAddress: "0x3a9f1d82e6b04c5a7f8e2d19b6c34a5e7f801234",
+      channel: "xmtp",
+      receivedAt: new Date(now - 30000).toISOString(),
+    },
+    {
+      type: "offer_score",
+      offerId: "9c3f17",
+      score: 31,
+      status: "rejected",
+      breakdown: { priceScore: 47, leadTimeScore: 67, certificationScore: 0 },
+      feedback: "Offer does not meet minimum requirements. Score: 31/100.",
+      supplierName: "ShenTech Manufacturing",
+      supplierAddress: "0x7b2c4e8f1a3d5690b2e7c4f8a1d3e5b7c9023456",
+      channel: "xmtp",
+      receivedAt: new Date(now - 15000).toISOString(),
+    },
+  );
+  console.log("[HTTP] Demo data loaded — 3 offers");
+  return c.json({ status: "ok", loaded: 3 });
+});
+
 // --- Dashboard data endpoint ---
 app.get("/api/offers", (c) => {
   return c.json({

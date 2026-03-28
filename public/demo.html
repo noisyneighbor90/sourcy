@@ -752,6 +752,7 @@
           cursor: pointer;
           outline: none;
         "></select>
+        <button class="btn-reset" onclick="loadDemoData()">Load Demo</button>
         <button class="btn-reset" onclick="resetDemo()">Reset</button>
       </div>
     </div>
@@ -883,6 +884,13 @@
         <div class="empty-title">No offers yet</div>
         <div class="empty-sub">Submit an offer from the supplier panel</div>
       </div>`;
+    loadOffers();
+  }
+
+  async function loadDemoData() {
+    await fetch(`${API}/api/offers/demo`, { method: 'POST' });
+    knownOfferIds = new Set();
+    await loadOffers();
   }
 
   // ---- Submit ----

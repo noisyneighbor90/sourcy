@@ -757,9 +757,9 @@
     </div>
 
     <div class="stats-row" id="statsRow">
-      <div class="stat-box"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total received</div></div>
-      <div class="stat-box"><div class="stat-num stat-green" id="statQualified">0</div><div class="stat-label">Qualified</div></div>
-      <div class="stat-box"><div class="stat-num stat-red" id="statRejected">0</div><div class="stat-label">Rejected</div></div>
+      <div class="stat-box"><div class="stat-num" id="statTotal">&mdash;</div><div class="stat-label">Total received</div></div>
+      <div class="stat-box"><div class="stat-num stat-green" id="statQualified">&mdash;</div><div class="stat-label">Qualified</div></div>
+      <div class="stat-box"><div class="stat-num stat-red" id="statRejected">&mdash;</div><div class="stat-label">Rejected</div></div>
     </div>
 
     <div class="card" style="padding: 16px;">
@@ -1036,9 +1036,9 @@
       const res = await fetch(`${API}/api/offers`);
       const data = await res.json();
 
-      document.getElementById('statTotal').textContent = data.total;
-      document.getElementById('statQualified').textContent = data.qualified;
-      document.getElementById('statRejected').textContent = data.rejected;
+      document.getElementById('statTotal').textContent = data.total || '\u2014';
+      document.getElementById('statQualified').textContent = data.qualified || '\u2014';
+      document.getElementById('statRejected').textContent = data.rejected || '\u2014';
 
       const list = document.getElementById('offersList');
       if (data.offers.length === 0) return;

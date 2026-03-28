@@ -3,590 +3,144 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sourcy</title>
+  <title>Sourcy — Verified Agent-to-Agent Commerce</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    :root {
-      --black: #000000;
-      --white: #FFFFFF;
-      --gray-50: #FAFAFA;
-      --gray-100: #F7F7F7;
-      --gray-200: #E5E5E5;
-      --gray-400: #9B9B9B;
-      --gray-600: #6B6B6B;
-      --green: #00C27A;
-      --red: #FF4444;
-      --amber: #F5A623;
-    }
-
     body {
       font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--gray-50);
-      color: var(--black);
+      background: #fff;
+      color: #000;
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ---- Header ---- */
     header {
-      background: var(--white);
-      border-bottom: 1px solid var(--gray-200);
-      padding: 0 24px;
+      padding: 0 32px;
       height: 52px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      border-bottom: 1px solid #E5E5E5;
     }
 
     .logo {
       font-size: 18px;
       font-weight: 700;
       letter-spacing: -0.5px;
-      color: var(--black);
     }
 
     .badges { display: flex; gap: 6px; }
-    .badge-wrap { position: relative; }
 
     .badge {
       padding: 4px 12px;
       border-radius: 100px;
       font-size: 11px;
       font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
-      border: 1px solid var(--gray-200);
-      background: var(--white);
-      color: var(--gray-600);
-    }
-    .badge:hover { border-color: var(--gray-400); }
-
-    .tooltip {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      width: 260px;
-      background: var(--black);
-      color: #ccc;
-      font-size: 12px;
-      line-height: 1.5;
-      padding: 12px 14px;
-      border-radius: 12px;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.15s, visibility 0.15s;
-      pointer-events: none;
-      z-index: 200;
-    }
-    .tooltip::before {
-      content: '';
-      position: absolute;
-      top: -4px;
-      right: 16px;
-      width: 8px;
-      height: 8px;
-      background: var(--black);
-      transform: rotate(45deg);
-    }
-    .badge-wrap:hover .tooltip { opacity: 1; visibility: visible; }
-
-    /* ---- Layout ---- */
-    .layout {
-      display: flex;
-      justify-content: center;
-      min-height: calc(100vh - 52px);
+      border: 1px solid #E5E5E5;
+      color: #6B6B6B;
     }
 
-    .panels {
-      display: grid;
-      grid-template-columns: 1fr 60px 1fr;
-      max-width: 920px;
-      width: 100%;
+    /* Hero */
+    .hero {
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 100px 24px 80px;
     }
 
-    .panel {
-      padding: 24px 20px 40px;
-      overflow-y: auto;
-    }
-    .panel-supplier { background: var(--white); }
-    .panel-buyer { background: var(--gray-50); }
-
-    /* ---- Panel header ---- */
-    .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .panel-header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .panel-title { font-size: 15px; font-weight: 600; }
-    .panel-subtitle { font-size: 12px; color: var(--gray-400); }
-
-    .btn-reset {
-      padding: 5px 12px;
-      border: 1px solid var(--gray-200);
-      border-radius: 8px;
-      background: var(--white);
-      color: var(--gray-400);
-      font-size: 11px;
-      font-weight: 500;
-      font-family: 'Inter', sans-serif;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-reset:hover { border-color: var(--gray-400); color: var(--gray-600); }
-
-    /* ---- Cards ---- */
-    .card {
-      background: var(--white);
-      border: 1px solid var(--gray-200);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-    .panel-buyer .card { box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--gray-400);
-      margin-bottom: 12px;
+    .hero h1 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.15;
     }
 
-    /* ---- Verification ---- */
-    .verify-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--gray-100);
-      font-size: 13px;
-    }
-    .verify-row:last-child { border-bottom: none; }
-
-    .verify-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .verify-dot.green { background: var(--green); }
-    .verify-dot.dark { background: var(--black); }
-
-    @keyframes pulse-dot {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(0,194,122,0.4); }
-      50% { box-shadow: 0 0 0 5px rgba(0,194,122,0); }
-    }
-    .verify-dot.pulsing { animation: pulse-dot 0.8s ease 2; }
-
-    .verify-label { font-weight: 500; color: var(--black); }
-    .verify-value {
-      color: var(--gray-400);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      margin-left: auto;
+    .hero p {
+      margin-top: 16px;
+      font-size: 17px;
+      line-height: 1.6;
+      color: #6B6B6B;
     }
 
-    /* ---- Form ---- */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .form-group.full { grid-column: 1 / -1; }
-
-    .form-group label {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--gray-400);
-    }
-    .form-group input, .form-group textarea {
-      background: var(--gray-50);
-      border: 1px solid var(--gray-200);
-      border-radius: 8px;
-      padding: 9px 12px;
-      color: var(--black);
-      font-size: 13px;
-      font-family: 'Inter', sans-serif;
-      transition: border-color 0.15s;
-    }
-    .form-group textarea { resize: vertical; min-height: 52px; }
-    .form-group input:focus, .form-group textarea:focus {
-      outline: none;
-      border-color: var(--black);
-    }
-
-    .btn-submit {
-      margin-top: 14px;
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
-      background: var(--black);
-      color: var(--white);
-      font-size: 14px;
+    .hero-btn {
+      display: inline-block;
+      margin-top: 32px;
+      padding: 14px 36px;
+      background: #000;
+      color: #fff;
+      font-size: 15px;
       font-weight: 600;
       font-family: 'Inter', sans-serif;
-      cursor: pointer;
+      border-radius: 12px;
+      text-decoration: none;
       transition: opacity 0.15s;
     }
-    .btn-submit:hover { opacity: 0.85; }
-    .btn-submit:disabled { opacity: 0.35; cursor: not-allowed; }
+    .hero-btn:hover { opacity: 0.85; }
 
-    /* ---- Activity Log ---- */
-    .log-box {
-      background: var(--gray-100);
-      border-radius: 12px;
-      padding: 14px 16px;
-      margin-top: 12px;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .log-box::-webkit-scrollbar { width: 3px; }
-    .log-box::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 2px; }
-
-    .log-header {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--gray-400);
-      margin-bottom: 8px;
-    }
-
-    .log-entry {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      padding: 2px 0;
-      display: flex;
-      gap: 8px;
-      line-height: 1.7;
-    }
-    .log-entry .time { color: var(--gray-400); flex-shrink: 0; }
-    .log-entry .action { color: var(--black); }
-    .log-entry .success { color: var(--green); }
-    .log-entry .payment { color: var(--gray-600); }
-    .log-entry .default { color: var(--gray-400); }
-
-    /* ---- Network Strip (vertical center column) ---- */
-    .network-bar {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      background: var(--gray-50);
-    }
-
-    .net-vis {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* Vertical connection line */
-    .net-line {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      width: 1px;
-      background: var(--gray-200);
-      transform: translateX(-50%);
-      z-index: 1;
-    }
-
-    /* Nodes */
-    .net-node {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      z-index: 3;
-    }
-    .net-node.top { top: 24px; }
-    .net-node.bottom { bottom: 24px; }
-
-    .net-ring {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 2px solid var(--gray-200);
-      background: var(--white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
-    }
-    .net-node.top .net-ring { border-color: #3b82f6; }
-    .net-node.bottom .net-ring { border-color: var(--green); }
-
-    .net-ring svg { width: 14px; height: 14px; }
-
-    @keyframes node-pulse-blue {
-      0%, 100% { box-shadow: none; }
-      50% { box-shadow: 0 0 0 6px rgba(59,130,246,0.15); }
-    }
-    @keyframes node-pulse-green {
-      0%, 100% { box-shadow: none; }
-      50% { box-shadow: 0 0 0 6px rgba(0,194,122,0.15); }
-    }
-    .net-node.top.pulse .net-ring { animation: node-pulse-blue 0.6s ease; }
-    .net-node.bottom.pulse .net-ring { animation: node-pulse-green 0.6s ease; }
-
-    .net-label {
-      font-size: 8px;
-      font-weight: 600;
-      color: var(--gray-400);
-      margin-top: 3px;
-      letter-spacing: 0.3px;
-    }
-
-    .net-line-label {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-90deg);
-      font-size: 8px;
-      color: var(--gray-400);
-      letter-spacing: 0.8px;
-      white-space: nowrap;
-      z-index: 2;
-    }
-
-    /* Packets — travel top to bottom */
-    .net-packet {
-      position: absolute;
-      left: 50%;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      transform: translateX(-50%);
-      z-index: 5;
-      animation: net-pkt 800ms ease-in-out forwards;
-    }
-    .net-packet::after {
-      content: '';
-      position: absolute;
-      inset: -3px;
-      border-radius: 50%;
-      border: 1px solid currentColor;
-      opacity: 0.3;
-    }
-    @keyframes net-pkt {
-      0% { top: 20px; opacity: 0; }
-      8% { opacity: 1; }
-      92% { opacity: 1; }
-      100% { top: calc(100% - 28px); opacity: 0; }
-    }
-
-    /* Idle — slow dot traveling bottom to top */
-    .net-idle {
-      position: absolute;
-      left: 50%;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--gray-200);
-      transform: translateX(-50%);
-      z-index: 2;
-      animation: net-idle-travel 4s ease-in-out infinite;
-    }
-    @keyframes net-idle-travel {
-      0% { top: calc(100% - 30px); opacity: 0; }
-      10% { opacity: 0.5; }
-      90% { opacity: 0.5; }
-      100% { top: 26px; opacity: 0; }
-    }
-    .network-bar.active .net-idle { opacity: 0 !important; animation: none; }
-
-    /* ---- Criteria ---- */
-    .criteria-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      padding: 4px 0;
-    }
-    .criteria-cell .c-label {
-      font-size: 12px;
-      color: var(--gray-400);
-      margin-bottom: 2px;
-    }
-    .criteria-cell .c-value {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--black);
-    }
-
-    /* ---- Offer Cards ---- */
-    .offers-list { display: flex; flex-direction: column; gap: 10px; }
-
-    @keyframes offer-in {
-      0% { opacity: 0; transform: translateY(-6px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-    .offer-card.is-new { animation: offer-in 0.4s ease forwards; }
-
-    .offer-card {
-      background: var(--white);
-      border: 1px solid var(--gray-200);
-      border-radius: 12px;
-      padding: 16px;
-      transition: box-shadow 0.15s;
-    }
-    .offer-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-
-    .offer-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
-    .offer-name-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .status-dot.qualified { background: var(--green); }
-    .status-dot.under_review { background: var(--amber); }
-    .status-dot.rejected { background: var(--red); }
-
-    .offer-supplier-name { font-size: 14px; font-weight: 600; }
-    .offer-meta { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
-    .channel-tag {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 500;
-      padding: 1px 6px;
-      border-radius: 4px;
-      background: var(--gray-100);
-      color: var(--gray-600);
-      margin-left: 4px;
-    }
-
-    .score-pill {
-      padding: 3px 12px;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-    .score-pill.qualified { background: #E6F9F1; color: #00A066; }
-    .score-pill.under_review { background: #FFF5E0; color: #C4850A; }
-    .score-pill.rejected { background: #FFEEEE; color: #CC0000; }
-
-    .offer-grid {
+    /* Cards */
+    .cards {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 24px 100px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .offer-stat .s-label { font-size: 11px; color: var(--gray-400); margin-bottom: 1px; }
-    .offer-stat .s-value { font-size: 13px; font-weight: 600; }
-
-    .score-bars { display: flex; gap: 12px; }
-    .score-bar { flex: 1; }
-    .bar-label {
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--gray-400);
-      margin-bottom: 4px;
-    }
-    .bar-track {
-      height: 4px;
-      background: var(--gray-100);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: 2px;
-      transition: width 0.5s ease;
-    }
-    .bar-fill.high { background: var(--green); }
-    .bar-fill.mid { background: var(--amber); }
-    .bar-fill.low { background: var(--red); }
-
-    .offer-feedback {
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--gray-100);
-      font-size: 12px;
-      color: var(--gray-600);
-      line-height: 1.5;
+      gap: 16px;
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--gray-400);
+    .card {
+      border: 1px solid #E5E5E5;
+      border-radius: 14px;
+      padding: 28px 24px;
     }
-    .empty-icon {
+
+    .card-icon {
       width: 40px;
       height: 40px;
-      margin: 0 auto 10px;
-      background: var(--gray-100);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      margin-bottom: 16px;
     }
-    .empty-title { font-size: 13px; font-weight: 600; color: var(--gray-600); }
-    .empty-sub { font-size: 12px; margin-top: 3px; }
+    .card-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    .card-icon.world { background: #E6F9F1; }
+    .card-icon.world svg { stroke: #00C27A; }
+    .card-icon.x402 { background: #F7F7F7; }
+    .card-icon.x402 svg { stroke: #000; }
+    .card-icon.xmtp { background: #F7F7F7; }
+    .card-icon.xmtp svg { stroke: #6B6B6B; }
 
-    /* ---- Responsive ---- */
-    @media (max-width: 920px) {
-      .layout { display: block; }
-      .panels {
-        display: flex;
-        flex-direction: column;
-        max-width: 420px;
-        margin: 0 auto;
-      }
-      .panel { width: 100%; }
-      .network-bar {
-        flex-direction: row;
-        height: 48px;
-        border-top: 1px solid var(--gray-200);
-        border-bottom: 1px solid var(--gray-200);
-      }
-      .network-bar .net-vis { flex-direction: row; height: 48px; }
-      .network-bar .net-line {
-        top: 50%; bottom: auto; left: 0; right: 0;
-        width: 100%; height: 1px;
-        transform: translateY(-50%);
-      }
-      .network-bar .net-node { transform: translateY(-50%); top: 50%; left: auto; bottom: auto; }
-      .network-bar .net-node.top { left: 12px; transform: translateY(-50%); top: 50%; }
-      .network-bar .net-node.bottom { right: 12px; left: auto; transform: translateY(-50%); top: 50%; }
-      .network-bar .net-line-label { transform: none; position: static; }
-      .criteria-grid { grid-template-columns: 1fr 1fr; }
+    .card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 13px;
+      line-height: 1.55;
+      color: #6B6B6B;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid #E5E5E5;
+      padding: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #9B9B9B;
+    }
+
+    @media (max-width: 700px) {
+      .hero h1 { font-size: 30px; }
+      .hero { padding: 60px 24px 50px; }
+      .cards { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -595,390 +149,45 @@
 <header>
   <div class="logo">sourcy</div>
   <div class="badges">
-    <div class="badge-wrap">
-      <span class="badge">World ID</span>
-      <div class="tooltip">Every agent proves human backing via World ID. The buyer verifies each agent through AgentBook and rejects bots automatically.</div>
-    </div>
-    <div class="badge-wrap">
-      <span class="badge">x402</span>
-      <div class="tooltip">Offer submission costs 0.01 USDC via HTTP 402 micropayment. Per-request pricing makes spam economically impossible.</div>
-    </div>
-    <div class="badge-wrap">
-      <span class="badge">XMTP</span>
-      <div class="tooltip">Agents communicate over XMTP, a decentralized messaging protocol. Structured offers are sent peer-to-peer with no central server.</div>
-    </div>
+    <span class="badge">World ID</span>
+    <span class="badge">x402</span>
+    <span class="badge">XMTP</span>
   </div>
 </header>
 
-<div class="layout">
-<div class="panels">
+<section class="hero">
+  <h1>Verified agent-to-agent commerce.</h1>
+  <p>Every agent is human-backed. Every interaction has a cost. No spam. No noise.</p>
+  <a href="/demo.html" class="hero-btn">Open Live Demo</a>
+</section>
 
-  <!-- SUPPLIER -->
-  <div class="panel panel-supplier">
-    <div class="panel-header">
-      <div class="panel-header-left">
-        <div>
-          <div class="panel-title">Supplier Agent</div>
-          <div class="panel-subtitle">Verified sender</div>
-        </div>
-      </div>
+<section class="cards">
+  <div class="card">
+    <div class="card-icon world">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
     </div>
-
-    <div class="card">
-      <div class="section-label">VERIFICATION</div>
-      <div class="verify-row">
-        <div class="verify-dot green" id="dotWorld"></div>
-        <span class="verify-label">World ID</span>
-        <span class="verify-value">Verified</span>
-      </div>
-      <div class="verify-row">
-        <div class="verify-dot dark"></div>
-        <span class="verify-label">Wallet</span>
-        <span class="verify-value" id="supplier-address">0x256c...8704</span>
-      </div>
-      <div class="verify-row">
-        <div class="verify-dot dark"></div>
-        <span class="verify-label">XMTP</span>
-        <span class="verify-value">Connected</span>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-label">NEW OFFER</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Supplier name</label>
-          <input type="text" id="supplierName" value="Acme Industrial Sensors Ltd.">
-        </div>
-        <div class="form-group">
-          <label>Item</label>
-          <input type="text" id="item" value="industrial sensors">
-        </div>
-        <div class="form-group">
-          <label>Quantity</label>
-          <input type="number" id="quantity" value="500">
-        </div>
-        <div class="form-group">
-          <label>Unit price (USD)</label>
-          <input type="number" id="unitPrice" value="125" step="0.01">
-        </div>
-        <div class="form-group">
-          <label>Lead time (days)</label>
-          <input type="number" id="leadTimeDays" value="21">
-        </div>
-        <div class="form-group">
-          <label>Certifications</label>
-          <input type="text" id="certifications" value="ISO 9001, CE, UL">
-        </div>
-        <div class="form-group full">
-          <label>Notes</label>
-          <textarea id="notes">Free shipping for orders over 200 units. 2-year warranty included.</textarea>
-        </div>
-      </div>
-      <button class="btn-submit" id="submitBtn" onclick="submitOffer()">
-        Submit Offer &mdash; 0.01 USDC
-      </button>
-    </div>
-
-    <div class="log-box" id="supplierLog">
-      <div class="log-header">ACTIVITY LOG</div>
-    </div>
+    <h3>World ID</h3>
+    <p>Every agent cryptographically proves it represents a verified unique human. No anonymous bots.</p>
   </div>
-
-  <!-- NETWORK STRIP -->
-  <div class="network-bar" id="networkBar">
-    <div class="net-vis" id="netVis">
-      <div class="net-line"></div>
-      <div class="net-node top" id="nodeSupplier">
-        <div class="net-ring">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div class="net-label">Supplier</div>
-      </div>
-      <div class="net-line-label">XMTP</div>
-      <div class="net-node bottom" id="nodeBuyer">
-        <div class="net-ring">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-        </div>
-        <div class="net-label">Buyer</div>
-      </div>
-      <div class="net-idle"></div>
+  <div class="card">
+    <div class="card-icon x402">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
     </div>
+    <h3>x402</h3>
+    <p>Every offer submission costs 0.01 USDC on-chain. Spam becomes economically impossible.</p>
   </div>
-
-  <!-- BUYER -->
-  <div class="panel panel-buyer">
-    <div class="panel-header">
-      <div class="panel-header-left">
-        <div>
-          <div class="panel-title">Buyer Dashboard</div>
-          <div class="panel-subtitle">Procurement manager</div>
-        </div>
-      </div>
-      <button class="btn-reset" onclick="resetDemo()">Reset</button>
+  <div class="card">
+    <div class="card-icon xmtp">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </div>
-
-    <div class="card" style="padding: 16px;">
-      <div class="section-label">PROCUREMENT CRITERIA</div>
-      <div class="criteria-grid" id="criteriaGrid">
-        <div class="criteria-cell"><div class="c-label">Item</div><div class="c-value">&mdash;</div></div>
-        <div class="criteria-cell"><div class="c-label">Max price</div><div class="c-value">&mdash;</div></div>
-        <div class="criteria-cell"><div class="c-label">Max lead time</div><div class="c-value">&mdash;</div></div>
-        <div class="criteria-cell"><div class="c-label">Required certs</div><div class="c-value">&mdash;</div></div>
-      </div>
-    </div>
-
-    <div class="section-label" style="margin-bottom: 10px;">RECEIVED OFFERS</div>
-    <div class="offers-list" id="offersList">
-      <div class="empty-state">
-        <div class="empty-icon">&#x1F4E5;</div>
-        <div class="empty-title">No offers yet</div>
-        <div class="empty-sub">Submit an offer from the supplier panel</div>
-      </div>
-    </div>
+    <h3>XMTP</h3>
+    <p>Agents communicate peer-to-peer over a decentralized messaging protocol. No central server.</p>
   </div>
+</section>
 
-</div>
-</div>
+<footer>
+  Built at World x Coinbase x XMTP AgentKit Hackathon 2026
+</footer>
 
-<script>
-  const API = window.location.origin;
-  let knownOfferIds = new Set();
-
-  // ---- Network bar ----
-  function pulseNode(side) {
-    const el = document.getElementById(side === 'supplier' ? 'nodeSupplier' : 'nodeBuyer');
-    el.classList.remove('pulse');
-    void el.offsetWidth;
-    el.classList.add('pulse');
-    setTimeout(() => el.classList.remove('pulse'), 700);
-  }
-
-  function sendPacket(color) {
-    const vis = document.getElementById('netVis');
-    const dot = document.createElement('div');
-    dot.className = 'net-packet';
-    dot.style.background = color;
-    dot.style.color = color;
-    vis.appendChild(dot);
-    pulseNode('buyer');
-    setTimeout(() => dot.remove(), 900);
-  }
-
-  function setStripActive(active) {
-    document.getElementById('networkBar').classList.toggle('active', active);
-  }
-
-  // ---- Log ----
-  function log(msg, type = 'default') {
-    const el = document.getElementById('supplierLog');
-    const time = new Date().toLocaleTimeString();
-    const entry = document.createElement('div');
-    entry.className = 'log-entry';
-    entry.innerHTML = `<span class="time">${time}</span><span class="${type}">${msg}</span>`;
-    el.appendChild(entry);
-    el.scrollTop = el.scrollHeight;
-  }
-
-  // ---- Data ----
-  async function loadCriteria() {
-    try {
-      const res = await fetch(`${API}/api/health`);
-      const data = await res.json();
-      const c = data.criteria;
-      document.getElementById('criteriaGrid').innerHTML = `
-        <div class="criteria-cell"><div class="c-label">Item</div><div class="c-value">${c.item}</div></div>
-        <div class="criteria-cell"><div class="c-label">Max price</div><div class="c-value">$${c.maxUnitPrice}</div></div>
-        <div class="criteria-cell"><div class="c-label">Max lead time</div><div class="c-value">${c.maxLeadTimeDays} days</div></div>
-        <div class="criteria-cell"><div class="c-label">Required certs</div><div class="c-value">${c.requiredCertifications.join(', ')}</div></div>
-      `;
-      if (data.xmtpAddress) {
-        const a = data.xmtpAddress;
-        document.getElementById('supplier-address').textContent = a.slice(0, 6) + '...' + a.slice(-4);
-      }
-    } catch (e) {}
-  }
-
-  async function resetDemo() {
-    await fetch(`${API}/api/offers/reset`, { method: 'DELETE' });
-    knownOfferIds = new Set();
-    document.getElementById('offersList').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">&#x1F4E5;</div>
-        <div class="empty-title">No offers yet</div>
-        <div class="empty-sub">Submit an offer from the supplier panel</div>
-      </div>`;
-  }
-
-  // ---- Submit ----
-  async function submitOffer() {
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Submitting...';
-
-    const offer = {
-      type: 'procurement_offer',
-      offerId: Math.random().toString(36).slice(2, 10),
-      supplierName: document.getElementById('supplierName').value,
-      item: document.getElementById('item').value,
-      quantity: parseInt(document.getElementById('quantity').value),
-      unitPrice: parseFloat(document.getElementById('unitPrice').value),
-      currency: 'USD',
-      leadTimeDays: parseInt(document.getElementById('leadTimeDays').value),
-      certifications: document.getElementById('certifications').value.split(',').map(s => s.trim()),
-      notes: document.getElementById('notes').value,
-    };
-
-    const delay = ms => new Promise(r => setTimeout(r, ms));
-
-    const dot = document.getElementById('dotWorld');
-    dot.classList.add('pulsing');
-    setTimeout(() => dot.classList.remove('pulsing'), 2000);
-
-    setStripActive(true);
-    pulseNode('supplier');
-    sendPacket('#000');
-    log('Connecting to buyer agent via XMTP...', 'action');
-
-    try {
-      await delay(800);
-      sendPacket('#00C27A');
-      log('World ID verification \u2014 agent is human-backed', 'success');
-
-      await delay(800);
-      sendPacket('#000');
-      log('Submitting offer to x402-protected endpoint...', 'action');
-
-      const res = await fetch(`${API}/api/offers`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(offer),
-      });
-
-      if (res.status === 402) {
-        await delay(800);
-        sendPacket('#6B6B6B');
-        log('Received HTTP 402 \u2014 Payment Required', 'payment');
-
-        await delay(800);
-        sendPacket('#6B6B6B');
-        log('Signing USDC transfer \u2014 0.01 USDC on Base...', 'payment');
-
-        await delay(800);
-        sendPacket('#6B6B6B');
-        log('Transaction submitted to network...', 'payment');
-
-        await delay(800);
-        sendPacket('#00C27A');
-        log('Payment confirmed on-chain \u2014 access granted', 'success');
-
-        await delay(800);
-        pulseNode('left');
-        sendPacket('#000');
-        const paidRes = await fetch(`${API}/api/offers/direct`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(offer),
-        });
-        const result = await paidRes.json();
-        log('Offer delivered to buyer agent', 'action');
-
-        if (result.type === 'offer_score') {
-          await delay(800);
-          sendPacket('#00C27A');
-          log(`Score received: ${result.score}/100 \u2014 ${result.status}`, 'success');
-        }
-      } else {
-        const result = await res.json();
-        if (result.type === 'offer_score') {
-          await delay(800);
-          sendPacket('#00C27A');
-          log(`Score received: ${result.score}/100 \u2014 ${result.status}`, 'success');
-        }
-      }
-    } catch (e) {
-      log(`Error: ${e.message}`, 'default');
-    }
-
-    setStripActive(false);
-    btn.disabled = false;
-    btn.textContent = 'Submit Offer \u2014 0.01 USDC';
-    loadOffers();
-  }
-
-  // ---- Render ----
-  function barClass(score) {
-    if (score >= 70) return 'high';
-    if (score >= 40) return 'mid';
-    return 'low';
-  }
-
-  function statusLabel(s) {
-    if (s === 'qualified') return 'Qualified';
-    if (s === 'under_review') return 'Under Review';
-    return 'Rejected';
-  }
-
-  function renderOffer(o, isNew) {
-    return `
-      <div class="offer-card${isNew ? ' is-new' : ''}">
-        <div class="offer-top">
-          <div>
-            <div class="offer-name-row">
-              <div class="status-dot ${o.status}"></div>
-              <div class="offer-supplier-name">${o.supplierName}</div>
-            </div>
-            <div class="offer-meta">${o.offerId} &middot; ${new Date(o.receivedAt).toLocaleTimeString()} <span class="channel-tag">${o.channel === 'xmtp' ? 'via XMTP' : 'via UI'}</span></div>
-          </div>
-          <div class="score-pill ${o.status}">${o.score}/100</div>
-        </div>
-        <div class="offer-grid">
-          <div class="offer-stat"><div class="s-label">Status</div><div class="s-value">${statusLabel(o.status)}</div></div>
-          <div class="offer-stat"><div class="s-label">Price score</div><div class="s-value">${o.breakdown.priceScore}%</div></div>
-          <div class="offer-stat"><div class="s-label">Certifications</div><div class="s-value">${o.breakdown.certificationScore}%</div></div>
-        </div>
-        <div class="score-bars">
-          <div class="score-bar">
-            <div class="bar-label">Price ${o.breakdown.priceScore}%</div>
-            <div class="bar-track"><div class="bar-fill ${barClass(o.breakdown.priceScore)}" style="width:${o.breakdown.priceScore}%"></div></div>
-          </div>
-          <div class="score-bar">
-            <div class="bar-label">Lead time ${o.breakdown.leadTimeScore}%</div>
-            <div class="bar-track"><div class="bar-fill ${barClass(o.breakdown.leadTimeScore)}" style="width:${o.breakdown.leadTimeScore}%"></div></div>
-          </div>
-          <div class="score-bar">
-            <div class="bar-label">Certs ${o.breakdown.certificationScore}%</div>
-            <div class="bar-track"><div class="bar-fill ${barClass(o.breakdown.certificationScore)}" style="width:${o.breakdown.certificationScore}%"></div></div>
-          </div>
-        </div>
-        <div class="offer-feedback">${o.feedback}</div>
-      </div>
-    `;
-  }
-
-  async function loadOffers() {
-    try {
-      const res = await fetch(`${API}/api/offers`);
-      const data = await res.json();
-      const list = document.getElementById('offersList');
-      if (data.offers.length === 0) return;
-
-      const statusOrder = { qualified: 0, under_review: 1, rejected: 2 };
-      const sorted = [...data.offers].sort((a, b) => {
-        const s = statusOrder[a.status] - statusOrder[b.status];
-        if (s !== 0) return s;
-        return b.score - a.score;
-      });
-
-      const newIds = new Set(sorted.map(o => o.offerId));
-      list.innerHTML = sorted.map(o => renderOffer(o, !knownOfferIds.has(o.offerId))).join('');
-      knownOfferIds = newIds;
-    } catch (e) {}
-  }
-
-  loadCriteria();
-  loadOffers();
-  setInterval(loadOffers, 3000);
-</script>
 </body>
 </html>

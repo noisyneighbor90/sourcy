@@ -180,6 +180,7 @@ app.get("/api/offers", (c) => {
 });
 
 // --- Serve frontend ---
+app.get("/demo", serveStatic({ path: "./public/demo.html" }));
 app.get("/*", serveStatic({ root: "./public" }));
 
 // ============================================================

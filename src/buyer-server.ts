@@ -38,18 +38,46 @@ const buyerWalletAddress = process.env.BUYER_WALLET_ADDRESS || "0xea7b03173ba82f
 // Base Sepolia for testing (Base mainnet eip155:8453 for production)
 const NETWORK = "eip155:84532";
 
-// Procurement criteria
-const criteria: ProcurementCriteria = {
-  item: "industrial sensors",
-  maxUnitPrice: 150,
-  maxLeadTimeDays: 30,
-  requiredCertifications: ["ISO 9001", "CE"],
-  targetQuantity: 500,
-};
+// Buyer profiles
+const profiles = [
+  {
+    name: "Nexon Electronics",
+    criteria: {
+      item: "PCB assembly",
+      maxUnitPrice: 15,
+      maxLeadTimeDays: 45,
+      requiredCertifications: ["ISO 9001", "IPC-A-610"],
+      targetQuantity: 500,
+    } as ProcurementCriteria,
+  },
+  {
+    name: "Baltic Robotics UAB",
+    criteria: {
+      item: "servo motors",
+      maxUnitPrice: 280,
+      maxLeadTimeDays: 30,
+      requiredCertifications: ["ISO 9001", "CE"],
+      targetQuantity: 500,
+    } as ProcurementCriteria,
+  },
+  {
+    name: "Nordic HVAC Group",
+    criteria: {
+      item: "plastic housings",
+      maxUnitPrice: 12,
+      maxLeadTimeDays: 60,
+      requiredCertifications: ["ISO 9001", "CE", "RoHS"],
+      targetQuantity: 500,
+    } as ProcurementCriteria,
+  },
+];
+
+let activeProfileIndex = 0;
+let criteria: ProcurementCriteria = profiles[0].criteria;
 
 // Store scored offers for dashboard
 export const scoredOffers: Array<
-  OfferScore & { supplierName: string; supplierAddress: string; receivedAt: string }
+  OfferScore & { supplierName: string; supplierAddress: string; channel: string; receivedAt: string }
 > = [];
 
 // ============================================================
@@ -107,9 +135,30 @@ app.get("/api/health", (c) => {
     status: "ok",
     agent: "sourcy-buyer",
     xmtpAddress: agent.address,
+    profileName: profiles[activeProfileIndex].name,
     criteria,
     offersReceived: scoredOffers.length,
   });
+});
+
+// --- Profile endpoints ---
+app.get("/api/profiles", (c) => {
+  return c.json({
+    profiles: profiles.map((p, i) => ({ index: i, name: p.name, criteria: p.criteria })),
+    active: activeProfileIndex,
+  });
+});
+
+app.post("/api/profiles/select", async (c) => {
+  const { profileIndex } = await c.req.json<{ profileIndex: number }>();
+  if (profileIndex < 0 || profileIndex >= profiles.length) {
+    return c.json({ error: "Invalid profile index" }, 400);
+  }
+  activeProfileIndex = profileIndex;
+  criteria = profiles[profileIndex].criteria;
+  scoredOffers.length = 0;
+  console.log(`[HTTP] Switched to profile: ${profiles[profileIndex].name}`);
+  return c.json({ status: "ok", name: profiles[profileIndex].name, criteria });
 });
 
 // --- Protected offer submission endpoint ---

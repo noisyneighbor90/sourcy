@@ -711,11 +711,25 @@
     <div class="panel-header">
       <div class="panel-header-left">
         <div>
-          <div class="panel-title">Buyer Dashboard</div>
+          <div class="panel-title" id="buyerTitle">Buyer Dashboard</div>
           <div class="panel-subtitle">Procurement manager</div>
         </div>
       </div>
-      <button class="btn-reset" onclick="resetDemo()">Reset</button>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <select id="profileSelect" onchange="selectProfile(this.value)" style="
+          padding: 5px 10px;
+          border: 1px solid var(--gray-200);
+          border-radius: 8px;
+          background: var(--white);
+          color: var(--black);
+          font-size: 12px;
+          font-weight: 500;
+          font-family: 'Inter', sans-serif;
+          cursor: pointer;
+          outline: none;
+        "></select>
+        <button class="btn-reset" onclick="resetDemo()">Reset</button>
+      </div>
     </div>
 
     <div class="card" style="padding: 16px;">
@@ -780,6 +794,34 @@
     el.scrollTop = el.scrollHeight;
   }
 
+  // ---- Profiles ----
+  async function loadProfiles() {
+    try {
+      const res = await fetch(`${API}/api/profiles`);
+      const data = await res.json();
+      const sel = document.getElementById('profileSelect');
+      sel.innerHTML = data.profiles.map(p =>
+        `<option value="${p.index}"${p.index === data.active ? ' selected' : ''}>${p.name}</option>`
+      ).join('');
+    } catch (e) {}
+  }
+
+  async function selectProfile(index) {
+    await fetch(`${API}/api/profiles/select`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileIndex: parseInt(index) }),
+    });
+    knownOfferIds = new Set();
+    document.getElementById('offersList').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">&#x1F4E5;</div>
+        <div class="empty-title">No offers yet</div>
+        <div class="empty-sub">Submit an offer from the supplier panel</div>
+      </div>`;
+    await loadCriteria();
+  }
+
   // ---- Data ----
   async function loadCriteria() {
     try {
@@ -792,6 +834,9 @@
         <div class="criteria-cell"><div class="c-label">Max lead time</div><div class="c-value">${c.maxLeadTimeDays} days</div></div>
         <div class="criteria-cell"><div class="c-label">Required certs</div><div class="c-value">${c.requiredCertifications.join(', ')}</div></div>
       `;
+      if (data.profileName) {
+        document.getElementById('buyerTitle').textContent = data.profileName;
+      }
       if (data.xmtpAddress) {
         const a = data.xmtpAddress;
         document.getElementById('supplier-address').textContent = a.slice(0, 6) + '...' + a.slice(-4);
@@ -976,6 +1021,7 @@
     } catch (e) {}
   }
 
+  loadProfiles();
   loadCriteria();
   loadOffers();
   setInterval(loadOffers, 3000);

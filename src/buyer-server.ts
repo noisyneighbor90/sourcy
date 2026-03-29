@@ -25,7 +25,7 @@ import {
   InMemoryAgentKitStorage,
 } from "@worldcoin/agentkit";
 
-process.loadEnvFile(".env");
+try { process.loadEnvFile(".env"); } catch {}
 
 const walletKey = process.env.BUYER_WALLET_KEY!;
 const dbEncryptionKeyHex = process.env.BUYER_DB_ENCRYPTION_KEY!;

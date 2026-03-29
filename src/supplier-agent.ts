@@ -3,7 +3,7 @@ import { fromString } from "uint8arrays";
 import type { ProcurementOffer, OfferScore } from "./types.js";
 import { randomUUID } from "node:crypto";
 
-process.loadEnvFile(".env");
+try { process.loadEnvFile(".env"); } catch {}
 
 const walletKey = process.env.SUPPLIER_WALLET_KEY;
 const dbEncryptionKeyHex = process.env.SUPPLIER_DB_ENCRYPTION_KEY;

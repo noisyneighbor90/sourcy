@@ -3,7 +3,7 @@ import { fromString } from "uint8arrays";
 import { scoreOffer } from "./scoring.js";
 import type { ProcurementOffer, ProcurementCriteria, OfferScore } from "./types.js";
 
-process.loadEnvFile(".env");
+try { process.loadEnvFile(".env"); } catch {}
 
 const walletKey = process.env.BUYER_WALLET_KEY;
 const dbEncryptionKeyHex = process.env.BUYER_DB_ENCRYPTION_KEY;

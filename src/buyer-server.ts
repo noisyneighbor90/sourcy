@@ -87,47 +87,50 @@ export const scoredOffers: Array<
 const app = new Hono();
 app.use("/*", cors());
 
-// --- World AgentKit setup ---
-const agentBook = createAgentBookVerifier();
-const storage = new InMemoryAgentKitStorage();
-const hooks = createAgentkitHooks({
-  storage,
-  agentBook,
-  mode: { type: "free-trial", uses: 3 },
-});
+// --- x402 + World AgentKit setup (may fail if facilitator is unreachable) ---
+try {
+  const agentBook = createAgentBookVerifier();
+  const storage = new InMemoryAgentKitStorage();
+  const hooks = createAgentkitHooks({
+    storage,
+    agentBook,
+    mode: { type: "free-trial", uses: 3 },
+  });
 
-// --- x402 setup ---
-const facilitatorClient = new HTTPFacilitatorClient({
-  url: "https://x402.org/facilitator",
-});
+  const facilitatorClient = new HTTPFacilitatorClient({
+    url: "https://x402.org/facilitator",
+  });
 
-const evmScheme = new ExactEvmScheme();
+  const evmScheme = new ExactEvmScheme();
 
-const resourceServer = new x402ResourceServer(facilitatorClient)
-  .register(NETWORK, evmScheme)
-  .registerExtension(agentkitResourceServerExtension);
+  const resourceServer = new x402ResourceServer(facilitatorClient)
+    .register(NETWORK, evmScheme)
+    .registerExtension(agentkitResourceServerExtension);
 
-// x402 payment middleware — protects the offer submission endpoint
-app.use(
-  paymentMiddleware(
-    {
-      "POST /api/offers": {
-        accepts: {
-          scheme: "exact",
-          price: "$0.01",
-          network: NETWORK,
-          payTo: buyerWalletAddress,
+  app.use(
+    paymentMiddleware(
+      {
+        "POST /api/offers": {
+          accepts: {
+            scheme: "exact",
+            price: "$0.01",
+            network: NETWORK,
+            payTo: buyerWalletAddress,
+          },
+          description: "Submit a procurement offer to the buyer agent",
+          extensions: declareAgentkitExtension({
+            statement: "Verify your agent is backed by a real human via World ID",
+            mode: { type: "free-trial", uses: 3 },
+          }),
         },
-        description: "Submit a procurement offer to the buyer agent",
-        extensions: declareAgentkitExtension({
-          statement: "Verify your agent is backed by a real human via World ID",
-          mode: { type: "free-trial", uses: 3 },
-        }),
       },
-    },
-    resourceServer,
-  ),
-);
+      resourceServer,
+    ),
+  );
+  console.log("x402 payment gate active");
+} catch (e: any) {
+  console.log(`x402 setup skipped: ${e.message}`);
+}
 
 // --- Health endpoint ---
 let xmtpAddress: string | null = null;
@@ -296,6 +299,7 @@ serve({ fetch: app.fetch, port }, () => {
 // ============================================================
 
 if (walletKey && dbEncryptionKeyHex) {
+  try {
   const user = createUser(validHex(walletKey));
   const signer = createSigner(user);
   const encryptionKey = fromString(dbEncryptionKeyHex.replace("0x", ""), "hex");
@@ -369,8 +373,12 @@ if (walletKey && dbEncryptionKeyHex) {
   });
 
   await agent.start();
+  } catch (e: any) {
+    console.log(`XMTP agent failed to start: ${e.message}`);
+    console.log("Continuing with HTTP server only...");
+  }
 } else {
   console.log("XMTP keys not configured — running HTTP server only");
-  console.log(`Looking for: ${criteria.item}`);
-  console.log("Waiting for offers via HTTP...\n");
 }
+console.log(`Looking for: ${criteria.item}`);
+console.log("Waiting for offers via HTTP...\n");

@@ -27,8 +27,8 @@ import {
 
 try { process.loadEnvFile(".env"); } catch {}
 
-const walletKey = process.env.BUYER_WALLET_KEY!;
-const dbEncryptionKeyHex = process.env.BUYER_DB_ENCRYPTION_KEY!;
+const walletKey = process.env.BUYER_WALLET_KEY;
+const dbEncryptionKeyHex = process.env.BUYER_DB_ENCRYPTION_KEY;
 const env = (process.env.XMTP_ENV || "dev") as "dev" | "production";
 const port = parseInt(process.env.PORT || process.env.BUYER_PORT || "4001");
 
@@ -130,11 +130,13 @@ app.use(
 );
 
 // --- Health endpoint ---
+let xmtpAddress: string | null = null;
+
 app.get("/api/health", (c) => {
   return c.json({
     status: "ok",
     agent: "sourcy-buyer",
-    xmtpAddress: agent.address,
+    xmtpAddress,
     profileName: profiles[activeProfileIndex].name,
     criteria,
     offersReceived: scoredOffers.length,
@@ -282,84 +284,93 @@ app.get("/demo", serveStatic({ path: "./public/demo.html" }));
 app.get("/*", serveStatic({ root: "./public" }));
 
 // ============================================================
-// 2. XMTP AGENT (runs alongside the HTTP server)
+// 2. START HTTP SERVER
 // ============================================================
 
-const user = createUser(validHex(walletKey));
-const signer = createSigner(user);
-const encryptionKey = fromString(dbEncryptionKeyHex.replace("0x", ""), "hex");
-
-const agent = await Agent.create(signer, {
-  env,
-  dbEncryptionKey: encryptionKey,
-  dbPath: (inboxId) => `./${env}-buyer-${inboxId.slice(0, 8)}.db3`,
-});
-
-agent.on("text", async (ctx) => {
-  if (!ctx.isDm()) return;
-
-  const senderAddress = await ctx.getSenderAddress();
-  const raw = ctx.message.content as string;
-
-  let offer: ProcurementOffer;
-  try {
-    offer = JSON.parse(raw);
-    if (offer.type !== "procurement_offer") {
-      await ctx.conversation.sendText(
-        JSON.stringify({
-          type: "error",
-          message: 'Expected message type "procurement_offer".',
-        }),
-      );
-      return;
-    }
-  } catch {
-    await ctx.conversation.sendText(
-      JSON.stringify({
-        type: "error",
-        message:
-          "Could not parse message. Send a JSON object with type: procurement_offer.",
-      }),
-    );
-    return;
-  }
-
-  console.log(
-    `[XMTP] Offer ${offer.offerId} from ${offer.supplierName} (${senderAddress}): ${offer.quantity}x ${offer.item} @ $${offer.unitPrice}`,
-  );
-
-  const result = scoreOffer(offer, criteria);
-
-  scoredOffers.push({
-    ...result,
-    supplierName: offer.supplierName,
-    supplierAddress: senderAddress,
-    channel: "xmtp" as const,
-    receivedAt: new Date().toISOString(),
-  });
-
-  console.log(
-    `[XMTP] Scored: ${result.score}/100 — ${result.status}`,
-  );
-
-  await ctx.conversation.sendText(JSON.stringify(result));
-});
-
-agent.on("start", () => {
-  console.log("=== SOURCY BUYER AGENT ===");
-  console.log(`XMTP Address: ${agent.address}`);
-  console.log(`HTTP Server: http://localhost:${port}`);
-  console.log(`Environment: ${env}`);
-  console.log(`Looking for: ${criteria.item}`);
-  console.log(`Max price: $${criteria.maxUnitPrice} | Max lead time: ${criteria.maxLeadTimeDays}d`);
-  console.log(`Required certs: ${criteria.requiredCertifications.join(", ")}`);
-  console.log(`x402 payment: $0.01 USDC on Base Sepolia`);
-  console.log("Waiting for offers via XMTP and HTTP...\n");
-});
-
-// Start both XMTP agent and HTTP server
 serve({ fetch: app.fetch, port }, () => {
   console.log(`HTTP server listening on port ${port}`);
 });
 
-await agent.start();
+// ============================================================
+// 3. XMTP AGENT (optional — requires wallet keys)
+// ============================================================
+
+if (walletKey && dbEncryptionKeyHex) {
+  const user = createUser(validHex(walletKey));
+  const signer = createSigner(user);
+  const encryptionKey = fromString(dbEncryptionKeyHex.replace("0x", ""), "hex");
+
+  const agent = await Agent.create(signer, {
+    env,
+    dbEncryptionKey: encryptionKey,
+    dbPath: (inboxId) => `./${env}-buyer-${inboxId.slice(0, 8)}.db3`,
+  });
+
+  agent.on("text", async (ctx) => {
+    if (!ctx.isDm()) return;
+
+    const senderAddress = await ctx.getSenderAddress();
+    const raw = ctx.message.content as string;
+
+    let offer: ProcurementOffer;
+    try {
+      offer = JSON.parse(raw);
+      if (offer.type !== "procurement_offer") {
+        await ctx.conversation.sendText(
+          JSON.stringify({
+            type: "error",
+            message: 'Expected message type "procurement_offer".',
+          }),
+        );
+        return;
+      }
+    } catch {
+      await ctx.conversation.sendText(
+        JSON.stringify({
+          type: "error",
+          message:
+            "Could not parse message. Send a JSON object with type: procurement_offer.",
+        }),
+      );
+      return;
+    }
+
+    console.log(
+      `[XMTP] Offer ${offer.offerId} from ${offer.supplierName} (${senderAddress}): ${offer.quantity}x ${offer.item} @ $${offer.unitPrice}`,
+    );
+
+    const result = scoreOffer(offer, criteria);
+
+    scoredOffers.push({
+      ...result,
+      supplierName: offer.supplierName,
+      supplierAddress: senderAddress,
+      channel: "xmtp" as const,
+      receivedAt: new Date().toISOString(),
+    });
+
+    console.log(
+      `[XMTP] Scored: ${result.score}/100 — ${result.status}`,
+    );
+
+    await ctx.conversation.sendText(JSON.stringify(result));
+  });
+
+  agent.on("start", () => {
+    xmtpAddress = agent.address!;
+    console.log("=== SOURCY BUYER AGENT ===");
+    console.log(`XMTP Address: ${xmtpAddress}`);
+    console.log(`Environment: ${env}`);
+    console.log(`Looking for: ${criteria.item}`);
+    console.log(`Max price: $${criteria.maxUnitPrice} | Max lead time: ${criteria.maxLeadTimeDays}d`);
+    console.log(`Required certs: ${criteria.requiredCertifications.join(", ")}`);
+    console.log(`x402 payment: $0.01 USDC on Base Sepolia`);
+    console.log("Waiting for offers via XMTP and HTTP...\n");
+  });
+
+  await agent.start();
+} else {
+  console.log("XMTP keys not configured — running HTTP server only");
+  console.log(`Looking for: ${criteria.item}`);
+  console.log("Waiting for offers via HTTP...\n");
+}

@@ -30,7 +30,7 @@ process.loadEnvFile(".env");
 const walletKey = process.env.BUYER_WALLET_KEY!;
 const dbEncryptionKeyHex = process.env.BUYER_DB_ENCRYPTION_KEY!;
 const env = (process.env.XMTP_ENV || "dev") as "dev" | "production";
-const port = parseInt(process.env.BUYER_PORT || "4001");
+const port = parseInt(process.env.PORT || process.env.BUYER_PORT || "4001");
 
 // The buyer's wallet address — receives x402 payments
 const buyerWalletAddress = process.env.BUYER_WALLET_ADDRESS || "0xea7b03173ba82f8e294ce951adc9ea021abc09c6";
